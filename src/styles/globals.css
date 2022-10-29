@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  h1 {
+    @apply text-4xl font-bold py-4;
+  }
+  h2 {
+    @apply text-2xl  py-4;
+  }
+
+  .btn {
+    @apply bg-indigo-500 text-white rounded-md px-4 py-2 m-2 transition duration-300 ease-out select-none hover:bg-indigo-700 focus:outline-none flex items-center;
+  }
+
+  .btn-lg {
+    @apply text-xl;
+  }
+
+  .fixed-center {
+    @apply fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-3/4;
+  }
+}
