@@ -6,7 +6,7 @@ import CurrentUser from './currentUser';
 // rendering, and avoids any flash incorrect content on initial page load.
 export default function Header() {
   return (
-    <header className='backdrop-blur-md bg-transparent opacity-75 px-4 py-2 border-gray-600 border-b'>
+    <header className='backdrop-blur-md bg-transparent opacity-75 px-4 py-2 border-gray-600 border-b relative z-10'>
       <nav className='h-full w-full flex justify-between items-center'>
         <CurrentUser />
         <div className='flex h-full items-center'>

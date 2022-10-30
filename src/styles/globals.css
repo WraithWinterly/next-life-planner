@@ -7,18 +7,30 @@
     @apply text-4xl font-bold py-4;
   }
   h2 {
-    @apply text-2xl  py-4;
+    @apply text-2xl py-4;
   }
 
   .btn {
-    @apply bg-indigo-500 text-white rounded-md px-4 py-2 m-2 transition duration-300 ease-out select-none hover:bg-indigo-700 focus:outline-none flex items-center;
+    @apply bg-indigo-500 flex justify-center items-center text-white rounded-md px-4 py-2 m-2 transition ease-out select-none hover:bg-indigo-700 focus:outline-none;
   }
 
   .btn-lg {
-    @apply text-xl;
+    @apply text-xl pb-3;
   }
 
   .fixed-center {
     @apply fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-3/4;
+  }
+
+  .page-anim {
+    @apply fade-in slide-in-from-bottom-10 animate-in duration-300;
+  }
+
+  .input-label {
+    @apply block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300;
+  }
+
+  .input-field {
+    @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500;
   }
 }

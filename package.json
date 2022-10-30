@@ -18,6 +18,7 @@
     "Lluis Agusti <hi@llu.lu>"
   ],
   "dependencies": {
+    "@headlessui/react": "^1.7.3",
     "@next-auth/prisma-adapter": "^1.0.5",
     "@prisma/client": "^4.5.0",
     "@types/next-auth": "^3.15.0",

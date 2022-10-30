@@ -17,10 +17,23 @@ export default async function handler(
     return;
   }
 
+  if (!session) {
+    res.status(401).send({
+      message:
+        'You must be signed in to view the protected content on this page.',
+    });
+    return;
+  }
+
   const data = req.body[0] as EverydayTask;
-  console.log(data);
-  if (!data.name || !data.description) {
-    res.status(400).send({ message: 'Name and description is required.' });
+  data.name = data.name.trim();
+
+  if (!!data.description) {
+    data.description = data.description.trim();
+  }
+
+  if (!data.name) {
+    res.status(400).send({ message: 'Task name is required' });
     return;
   }
 
@@ -29,7 +42,7 @@ export default async function handler(
     data: data,
   });
 
-  const updatedUser = await prisma?.user.update({
+  await prisma?.user.update({
     where: {
       id: session?.user.id,
     },
@@ -45,14 +58,8 @@ export default async function handler(
     },
   });
 
-  if (session) {
-    return res.send({
-      content: task,
-    });
-  }
-
-  res.send({
-    error: 'You must be signed in to view the protected content on this page.',
+  return res.send({
+    content: task,
   });
 }
 5;

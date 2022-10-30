@@ -10,14 +10,21 @@ export default async function handler(
 ) {
   const session = await unstable_getServerSession(req, res, authOptions);
 
-  if (session) {
-    return res.send({
-      content: 'test',
+  if (!session) {
+    res.status(401).send({
+      message: 'You must be signed in to perform this action.',
     });
+    return;
   }
 
-  res.send({
-    error: 'You must be signed in to view the protected content on this page.',
+  const tasks = await prisma?.everydayTask.findMany({
+    where: {
+      userId: session?.user.id,
+    },
+  });
+
+  return res.send({
+    content: tasks,
   });
 }
 5;
