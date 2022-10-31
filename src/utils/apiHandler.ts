@@ -1,4 +1,4 @@
-import { EverydayTask } from '@prisma/client';
+import { DayTask, EverydayTask } from '@prisma/client';
 
 interface APIHandler {
   post: (apiPoint: string, postData: any) => Promise<any>;
@@ -34,9 +34,37 @@ export const getEveryDayTasks = async (): Promise<EverydayTask[]> => {
   return data.content as EverydayTask[];
 };
 
-export const postEverydayTasks = async (
+export const getEverydayTaskById = async (
+  id: string
+): Promise<EverydayTask> => {
+  const { data } = await apiHandler.post('/api/v1/post/getEverydayTaskById', {
+    id: id,
+  });
+  return data.content as EverydayTask;
+};
+
+export const getDayTasks = async (): Promise<EverydayTask[]> => {
+  const { data } = await apiHandler.get('/api/v1/get/dayTasks');
+  return data.content as DayTask[];
+};
+
+export const postEverydayTask = async (
   postData: any
 ): Promise<EverydayTask> => {
   const { data } = await apiHandler.post('/api/v1/post/everydayTask', postData);
+  return data.content as EverydayTask;
+};
+export const updateEverydayTaskById = async (
+  postData: any
+): Promise<EverydayTask> => {
+  const { data } = await apiHandler.post(
+    '/api/v1/post/updateEverydayTaskById',
+    postData
+  );
+  return data.content as EverydayTask;
+};
+
+export const postDayTask = async (postData: any): Promise<EverydayTask> => {
+  const { data } = await apiHandler.post('/api/v1/post/dayTask', postData);
   return data.content as EverydayTask;
 };

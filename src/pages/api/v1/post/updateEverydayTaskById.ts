@@ -26,38 +26,37 @@ export default async function handler(
   }
 
   const data = req.body[0] as EverydayTask;
-  data.name = data.name.trim();
-
-  data.name = data.name.substring(0, 50);
-  if (!!data.description) {
-    data.description = data.description.trim();
-    data.description = data.description.substring(0, 400);
-  }
 
   if (!data.name) {
     res.status(400).send({ message: 'Task name is required' });
     return;
   }
+  if (!data.id) {
+    res.status(400).send({ message: 'Invalid Task' });
+    return;
+  }
 
-  // Create everydaytask and connect to user
-  const task = await prisma?.everydayTask.create({
-    data: data,
-  });
+  if (data?.userId !== session?.user.id) {
+    res.status(401).send({
+      message: 'You are not authorized to edit this task.',
+    });
+    return;
+  }
 
-  await prisma?.user.update({
+  data.name = data.name.trim();
+
+  data.name = data.name.substring(0, 50);
+
+  if (!!data.description) {
+    data.description = data.description.trim();
+    data.description = data.description.substring(0, 400);
+  }
+
+  const task = await prisma?.everydayTask.update({
     where: {
-      id: session?.user.id,
+      id: data.id,
     },
-    data: {
-      everydayTasks: {
-        connect: {
-          id: task?.id,
-        },
-      },
-    },
-    include: {
-      everydayTasks: true,
-    },
+    data: data,
   });
 
   return res.send({

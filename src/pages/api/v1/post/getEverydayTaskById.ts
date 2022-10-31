@@ -13,7 +13,7 @@ export default async function handler(
   const session = await unstable_getServerSession(req, res, authOptions);
 
   if (req.method !== 'POST') {
-    res.status(405).send({ message: 'Only POST requests allowed.' });
+    res.status(405).send({ message: 'Only POST methods are allowed.' });
     return;
   }
 
@@ -25,40 +25,31 @@ export default async function handler(
     return;
   }
 
-  const data = req.body[0] as EverydayTask;
-  data.name = data.name.trim();
+  const data = req.body.id as string;
 
-  data.name = data.name.substring(0, 50);
-  if (!!data.description) {
-    data.description = data.description.trim();
-    data.description = data.description.substring(0, 400);
-  }
-
-  if (!data.name) {
-    res.status(400).send({ message: 'Task name is required' });
+  if (!data) {
+    res.status(400).send({ message: 'You need to specify an ID!' });
     return;
   }
 
   // Create everydaytask and connect to user
-  const task = await prisma?.everydayTask.create({
-    data: data,
+  const task = await prisma?.everydayTask.findUnique({
+    where: {
+      id: data,
+    },
   });
 
-  await prisma?.user.update({
-    where: {
-      id: session?.user.id,
-    },
-    data: {
-      everydayTasks: {
-        connect: {
-          id: task?.id,
-        },
-      },
-    },
-    include: {
-      everydayTasks: true,
-    },
-  });
+  if (!task) {
+    res.status(404).send({ message: 'Task not found!' });
+    return;
+  }
+
+  if (task?.userId !== session?.user.id) {
+    res.status(401).send({
+      message: 'You are not authorized to view this task.',
+    });
+    return;
+  }
 
   return res.send({
     content: task,

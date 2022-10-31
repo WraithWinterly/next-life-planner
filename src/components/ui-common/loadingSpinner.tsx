@@ -7,7 +7,7 @@ const LoadingSpinner = () => (
     size={60}
     strokeWidth={6}
     strokeColor='#ffffff'
-    duration={1000}
+    duration={500}
   />
 );
 

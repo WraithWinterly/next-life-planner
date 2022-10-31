@@ -2,7 +2,7 @@
 import { unstable_getServerSession } from 'next-auth/next';
 import { authOptions } from '../../auth/[...nextauth]';
 
-import { EverydayTask } from '@prisma/client';
+import { DayTask } from '@prisma/client';
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -25,7 +25,7 @@ export default async function handler(
     return;
   }
 
-  const data = req.body[0] as EverydayTask;
+  const data = req.body[0] as DayTask;
   data.name = data.name.trim();
 
   data.name = data.name.substring(0, 50);
@@ -40,7 +40,7 @@ export default async function handler(
   }
 
   // Create everydaytask and connect to user
-  const task = await prisma?.everydayTask.create({
+  const task = await prisma?.dayTask.create({
     data: data,
   });
 
@@ -49,7 +49,7 @@ export default async function handler(
       id: session?.user.id,
     },
     data: {
-      everydayTasks: {
+      dayTasks: {
         connect: {
           id: task?.id,
         },

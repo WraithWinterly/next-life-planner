@@ -1,21 +1,25 @@
 import { formatPrismaDate, numberToMonth } from '@/src/utils/dateHelper';
 import { EverydayTask } from '@prisma/client';
+import Router from 'next/router';
 import React from 'react';
 
 function TaskCard({ task }: { task: EverydayTask }) {
   return (
     <div>
-      <div className='flex flex-col items-start p-4 max-w-sm rounded-lg border shadow-md bg-slate-800 border-slate-700'>
-        <h2 className='mx-0 py-0'>{task.name}</h2>
-        <h3 className='mb-3 font-normal text-gray-400'>{task.description}</h3>
-        <h3 className='mb-3 font-normal text-gray-400'>
-          Created: {formatPrismaDate(task.createdAt)}
+      <div className='flex flex-col items-start text-start p-4 max-w-sm rounded-lg border shadow-md bg-slate-800 border-slate-700'>
+        <h2 className='mx-0 py-0 break-words w-full'>{task.name}</h2>
+        <h3 className='mb-3 font-normal break-words text-gray-400 w-full'>
+          {task.description}
         </h3>
         <h3 className='mb-3 font-normal text-gray-400'>
-          Updated: {formatPrismaDate(task.updatedAt)}
+          Created <b>{formatPrismaDate(task.createdAt)}</b>
         </h3>
 
-        <button className='btn w-20 mx-0'>
+        <button
+          className='btn w-20 mx-0'
+          onClick={() => {
+            Router.push(`/edit/everyday/${task.id}`);
+          }}>
           Edit
           <svg
             aria-hidden='true'

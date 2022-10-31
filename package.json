@@ -18,7 +18,9 @@
     "Lluis Agusti <hi@llu.lu>"
   ],
   "dependencies": {
+    "@formkit/auto-animate": "^1.0.0-beta.3",
     "@headlessui/react": "^1.7.3",
+    "@heroicons/react": "^2.0.12",
     "@next-auth/prisma-adapter": "^1.0.5",
     "@prisma/client": "^4.5.0",
     "@types/next-auth": "^3.15.0",

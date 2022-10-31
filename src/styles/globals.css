@@ -11,7 +11,7 @@
   }
 
   .btn {
-    @apply bg-indigo-500 flex justify-center items-center text-white rounded-md px-4 py-2 m-2 transition ease-out select-none hover:bg-indigo-700 focus:outline-none;
+    @apply bg-indigo-500 flex justify-center items-center cursor-pointer text-white rounded-md px-4 py-2 m-2 transition ease-out select-none hover:bg-indigo-700 focus:outline-none;
   }
 
   .btn-lg {
@@ -32,5 +32,9 @@
 
   .input-field {
     @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500;
+  }
+
+  .tw-btn-icon {
+    @apply flex h-6 w-6 shrink-0 items-center justify-center text-white;
   }
 }
