@@ -1,9 +1,15 @@
 import { formatPrismaDate, numberToMonth } from '@/src/utils/dateHelper';
-import { EverydayTask } from '@prisma/client';
+import { DayTask, EverydayTask } from '@prisma/client';
 import Router from 'next/router';
 import React from 'react';
 
-function TaskCard({ task }: { task: EverydayTask }) {
+function TaskCard({
+  task,
+  taskType,
+}: {
+  task: EverydayTask | DayTask;
+  taskType: 'everydayTask' | 'dayTask';
+}) {
   return (
     <div>
       <div className='flex flex-col items-start text-start p-4 max-w-sm rounded-lg border shadow-md bg-slate-800 border-slate-700'>
@@ -18,7 +24,9 @@ function TaskCard({ task }: { task: EverydayTask }) {
         <button
           className='btn w-20 mx-0'
           onClick={() => {
-            Router.push(`/edit/everyday/${task.id}`);
+            taskType === 'everydayTask'
+              ? Router.push(`/edit/everyday/${task.id}`)
+              : Router.push(`/edit/day/${task.id}`);
           }}>
           Edit
           <svg

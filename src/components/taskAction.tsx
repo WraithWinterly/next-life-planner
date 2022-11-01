@@ -3,12 +3,12 @@ import {
   postEverydayTask,
   postDayTask,
   updateEverydayTaskById,
+  updateDayTaskById,
 } from '@/src/utils/apiHandler';
 import { DayTask, EverydayTask } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { useState } from 'react';
-import Layout from '@components/layout';
 
 import { ArrowLeftIcon, PlusIcon } from '@heroicons/react/24/outline';
 
@@ -65,7 +65,7 @@ function TaskAction({
 
       type === 'everyday'
         ? await updateEverydayTaskById([taskData])
-        : await postDayTask([taskData]);
+        : await updateDayTaskById([taskData]);
       router.push('/dashboard');
     } catch (error) {
       console.log(error);
