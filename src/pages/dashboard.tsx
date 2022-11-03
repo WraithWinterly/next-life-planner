@@ -1,7 +1,7 @@
 import { useEffect, useState, useId } from 'react';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import Layout from '@components/layout';
-import { getDayTasks, getEveryDayTasks } from '@/src/utils/apiHandler';
+import { getDayTasks, getEveryDayTasks } from '@/src/utils/apiInterface';
 import { DayTask, EverydayTask } from '@prisma/client';
 import TaskCard from '@/src/components/dashboard/taskCard';
 

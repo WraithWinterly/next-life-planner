@@ -1,5 +1,5 @@
 import LoadingScreen from '@/src/components/ui-common/loadingScreen';
-import { getDayTaskById } from '@/src/utils/apiHandler';
+import { getDayTaskById } from '@/src/utils/apiInterface';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 

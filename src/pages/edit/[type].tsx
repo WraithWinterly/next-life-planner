@@ -1,5 +1,5 @@
 import LoadingScreen from '@/src/components/ui-common/loadingScreen';
-import { postEverydayTask, postDayTask } from '@/src/utils/apiHandler';
+import { postEverydayTask, postDayTask } from '@/src/utils/apiInterface';
 import { Dialog, Transition } from '@headlessui/react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';

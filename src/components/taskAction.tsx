@@ -4,7 +4,7 @@ import {
   postDayTask,
   updateEverydayTaskById,
   updateDayTaskById,
-} from '@/src/utils/apiHandler';
+} from '@/src/utils/apiInterface';
 import { DayTask, EverydayTask } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
