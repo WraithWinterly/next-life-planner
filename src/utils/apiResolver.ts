@@ -14,7 +14,8 @@ const apiResolver: APIResolver = {
         body: JSON.stringify(postData),
       });
       const data = await response.json();
-      return { data };
+
+      return data;
     } catch (error) {
       console.log(error);
     }

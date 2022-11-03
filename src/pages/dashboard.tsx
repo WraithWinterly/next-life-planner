@@ -1,7 +1,7 @@
 import { useEffect, useState, useId } from 'react';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import Layout from '@components/layout';
-import { getDayTasks, getEveryDayTasks } from '@/src/utils/apiInterface';
+import { getTasks } from '@/src/utils/apiInterface';
 import { DayTask, EverydayTask } from '@prisma/client';
 import TaskCard from '@/src/components/dashboard/taskCard';
 
@@ -24,7 +24,7 @@ export default function Dashboard() {
 
   const fetchData = async () => {
     try {
-      const everydayTasks = await getEveryDayTasks();
+      const everydayTasks = (await getTasks('EverydayTask')) as EverydayTask[];
       everydayTasks.sort((a, b) => {
         return a.createdAt > b.createdAt ? -1 : 1;
       });
@@ -35,7 +35,7 @@ export default function Dashboard() {
       setLoading(false);
     }
     try {
-      const dayTasks = await getDayTasks();
+      const dayTasks = (await getTasks('DayTask')) as DayTask[];
       dayTasks.sort((a, b) => {
         return a.createdAt > b.createdAt ? -1 : 1;
       });
