@@ -121,7 +121,11 @@ export default function Dashboard() {
                 {(loading || !everydayTasks) && <LoadingSpinner />}
                 {everydayTasks &&
                   everydayTasks.map((task, i) => (
-                    <TaskCard task={task} key={`${id}-${i}`} />
+                    <TaskCard
+                      task={task}
+                      key={`${id}-${i}`}
+                      taskType='everydayTask'
+                    />
                   ))}
                 {!!everydayTasks && everydayTasks.length == 0 && !loading && (
                   <p>There are no tasks for every day.</p>
@@ -138,7 +142,11 @@ export default function Dashboard() {
                 {(loading || !dayTasks) && <LoadingSpinner />}
                 {dayTasks &&
                   dayTasks.map((task, i) => (
-                    <TaskCard task={task} key={`${id}-${i}`} />
+                    <TaskCard
+                      task={task}
+                      key={`${id}-${i}`}
+                      taskType='dayTask'
+                    />
                   ))}
                 {!!dayTasks && dayTasks.length == 0 && !loading && (
                   <p>🎉 There are no tasks for today.</p>
