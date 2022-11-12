@@ -1,44 +1,55 @@
-import LoadingScreen from '@/src/components/ui-common/loadingScreen';
+import LoadingScreen from '@components/ui-common/loadingScreen';
 import {
-  postEverydayTask,
-  postDayTask,
-  updateEverydayTaskById,
-  updateDayTaskById,
-} from '@/src/utils/apiInterface';
-import { DayTask, EverydayTask } from '@prisma/client';
+  createTask,
+  CreateTaskData,
+  updateTaskById,
+} from '@utils/apiInterface';
+import { Task, TaskType } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { useState } from 'react';
 
 import { ArrowLeftIcon, PlusIcon } from '@heroicons/react/24/outline';
+import ListBox from './ui-common/listBox';
 
 function TaskAction({
   action,
-  type,
   editTaskData,
 }: {
   action: 'create' | 'edit';
-  type: 'day' | 'everyday';
-  editTaskData?: DayTask | EverydayTask;
+  editTaskData?: Task;
 }) {
-  const [taskData, setTaskData] = useState<EverydayTask | DayTask>({
+  const [taskData, setTaskData] = useState<Task>({
     name: '',
     description: '',
-  } as EverydayTask | DayTask);
+    taskType: TaskType.TODAY,
+  } as Task);
 
   const [loading, setLoading] = useState(false);
-
   const [submitError, setSubmitError] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     if (action == 'edit' && !!editTaskData?.name) {
-      setTaskData(editTaskData as DayTask | EverydayTask);
+      setTaskData(editTaskData as Task);
     }
   }, [editTaskData]);
 
+  const { type } = router.query;
+  console.log(type);
+  useEffect(() => {
+    if (action == 'create') {
+      switch (type) {
+        case 'today':
+          taskData.taskType = TaskType.TODAY;
+        case 'everyday':
+          taskData.taskType = TaskType.EVERYDAY;
+      }
+    }
+  }, [type]);
+
   const handleChange = (target: 'name' | 'description', e: any) => {
-    setTaskData((data) => {
+    setTaskData((data: any) => {
       const newData = data;
       newData[target] = e.target.value;
       return newData;
@@ -48,10 +59,7 @@ function TaskAction({
   const handleCreateTask = async () => {
     try {
       setLoading(true);
-
-      type === 'everyday'
-        ? await postEverydayTask([taskData])
-        : await postDayTask([taskData]);
+      createTask(taskData as CreateTaskData);
       router.push('/dashboard');
     } catch (error) {
       console.log(error);
@@ -63,9 +71,8 @@ function TaskAction({
     try {
       setLoading(true);
 
-      type === 'everyday'
-        ? await updateEverydayTaskById([taskData])
-        : await updateDayTaskById([taskData]);
+      await updateTaskById(taskData);
+
       router.push('/dashboard');
     } catch (error) {
       console.log(error);
@@ -115,47 +122,51 @@ function TaskAction({
       )}
 
       <div className='flex flex-col items-center'>
-        {type === 'everyday' ? (
-          <>
-            {action === 'create' ? (
-              <h1>Create a new daily task</h1>
-            ) : (
-              <h1>Edit daily task</h1>
-            )}
-
-            <h2>
-              This task will show up every day. You will set a goal to do this
-              every day.
-            </h2>
-          </>
+        {action === 'create' ? (
+          <h1>Create Task</h1>
         ) : (
-          <>
-            {action === 'create' ? (
-              <h1>Create task for Today</h1>
-            ) : (
-              <h1>Edit task for Today</h1>
-            )}
-            <h2>This task is for today only.</h2>
-          </>
+          <h1>
+            {taskData.taskType === TaskType.EVERYDAY
+              ? 'Edit Everyday Task'
+              : 'Edit Task'}
+          </h1>
         )}
 
         <div className='flex flex-col gap-3 items-center justify-center w-80'>
-          <div className='mt-4 flex flex-col gap-3 w-full'>
-            <InputField
-              name='Task Name'
-              target='name'
-              error={submitError}
-              maxLength={50}
-              handleChange={handleChange}
-            />
-            <InputField
-              name='Task Description'
-              target='description'
-              error={submitError}
-              maxLength={50}
-              handleChange={handleChange}
-            />
-          </div>
+          {action === 'create' && (
+            <div className='mt-4 flex flex-col gap-3 w-full'>
+              <ListBox
+                label='Task Type'
+                defaultValueIndex={type === 'today' ? 0 : 1}
+                selections={[
+                  'Create a task for only Today',
+                  'Create a task for Everyday',
+                ]}
+                handleSelection={(value) => {
+                  if (value === 'Create a task for only Today') {
+                    taskData.taskType = TaskType.TODAY;
+                  } else if (value === 'Create a task for Everyday') {
+                    taskData.taskType = TaskType.EVERYDAY;
+                  }
+                }}
+              />
+              <InputField
+                name='Task Name'
+                target='name'
+                error={submitError}
+                maxLength={50}
+                handleChange={handleChange}
+              />
+              <InputField
+                name='Task Description'
+                target='description'
+                error={submitError}
+                maxLength={50}
+                handleChange={handleChange}
+              />
+            </div>
+          )}
+
           <div className='mt-4 flex gap-3'>
             <button
               type='button'

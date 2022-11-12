@@ -1,16 +1,11 @@
-import { formatPrismaDate, numberToMonth } from '@/src/utils/dateHelper';
-import { DayTask, EverydayTask } from '@prisma/client';
+import { formatPrismaDate } from '@utils/dateHelper';
+import { Task, TaskType } from '@prisma/client';
 import Router from 'next/router';
 import React from 'react';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import Checkbox from '../ui-common/checkbox';
-function TaskCard({
-  task,
-  taskType,
-}: {
-  task: EverydayTask | DayTask;
-  taskType: 'everydayTask' | 'dayTask';
-}) {
+
+function TaskCard({ task }: { task: Task }) {
   const [checked, setChecked] = React.useState(task.completed);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(e.target.checked);
@@ -34,9 +29,7 @@ function TaskCard({
           <button
             className='btn w-20 mx-0'
             onClick={() => {
-              taskType === 'everydayTask'
-                ? Router.push(`/edit/everyday/${task.id}`)
-                : Router.push(`/edit/day/${task.id}`);
+              Router.push(`/edit/${task.id}`);
             }}>
             Edit
             <svg

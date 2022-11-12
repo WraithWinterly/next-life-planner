@@ -1,8 +1,8 @@
 // This is an example of to protect an API route
 import { unstable_getServerSession } from 'next-auth/next';
-import { authOptions } from '../../auth/[...nextauth]';
+import { authOptions } from '../auth/[...nextauth]';
 
-import { EverydayTask } from '@prisma/client';
+import { Task } from '@prisma/client';
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -25,7 +25,7 @@ export default async function handler(
     return;
   }
 
-  const data = req.body[0] as EverydayTask;
+  const data = req.body[0] as Task;
 
   if (!data.name) {
     res.status(400).send({ message: 'Task name is required' });
@@ -52,7 +52,7 @@ export default async function handler(
     data.description = data.description.substring(0, 400);
   }
 
-  const task = await prisma?.everydayTask.update({
+  const task = await prisma?.task.update({
     where: {
       id: data.id,
     },

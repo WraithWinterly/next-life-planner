@@ -1,5 +1,5 @@
-import LoadingScreen from '@/src/components/ui-common/loadingScreen';
-import LoadingSpinner from '@/src/components/ui-common/loadingSpinner';
+import LoadingScreen from '@components/ui-common/loadingScreen';
+import LoadingSpinner from '@components/ui-common/loadingSpinner';
 import { getProviders, signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useState } from 'react';

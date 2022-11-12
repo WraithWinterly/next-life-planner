@@ -1,21 +1,21 @@
-import LoadingScreen from '@/src/components/ui-common/loadingScreen';
-import { getDayTaskById } from '@/src/utils/apiInterface';
+import LoadingScreen from '@components/ui-common/loadingScreen';
+import { getTaskById } from '@utils/apiInterface';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
-import TaskAction from '@/src/components/taskAction';
-import { DayTask } from '@prisma/client';
+import TaskAction from '@components/taskAction';
 import { useState } from 'react';
-import Layout from '@/src/components/layout';
+import Layout from '@components/layout';
+import { Task } from '@prisma/client';
 
 function Edit() {
   const router = useRouter();
   const { id } = router.query;
 
-  const [taskData, setTaskData] = useState<DayTask>();
+  const [taskData, setTaskData] = useState<Task>();
 
   const fetchData = async (id: string) => {
-    const data = await getDayTaskById(id);
+    const data = await getTaskById(id);
     setTaskData(data);
   };
 
@@ -33,7 +33,7 @@ function Edit() {
     <Layout>
       {!!taskData ? (
         <TaskAction
-          type={'day'}
+          selectType={taskData.taskType}
           action='edit'
           editTaskData={taskData}></TaskAction>
       ) : (

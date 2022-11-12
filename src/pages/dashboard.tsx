@@ -1,53 +1,49 @@
 import { useEffect, useState, useId } from 'react';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import Layout from '@components/layout';
-import { getTasks } from '@/src/utils/apiInterface';
-import { DayTask, EverydayTask } from '@prisma/client';
-import TaskCard from '@/src/components/dashboard/taskCard';
+import { getTasks } from '@utils/apiInterface';
+
+import TaskCard from '@components/dashboard/taskCard';
 
 import { signIn, useSession } from 'next-auth/react';
 import Router from 'next/router';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/ui-common/loadingSpinner';
+import { Task, TaskType } from '@prisma/client';
 
 export default function Dashboard() {
   const [animator] = useAutoAnimate<HTMLDivElement>();
   const session = useSession();
   const [loading, setLoading] = useState(true);
 
-  const [everydayTasks, setEverydayTasks] = useState<EverydayTask[] | null>(
-    null
-  );
-  const [dayTasks, setDayTasks] = useState<DayTask[] | null>(null);
+  const [tasks, setTasks] = useState<Task[] | null>(null);
 
   const id = useId();
 
   const fetchData = async () => {
     try {
-      const everydayTasks = (await getTasks('EverydayTask')) as EverydayTask[];
-      everydayTasks.sort((a, b) => {
-        return a.createdAt > b.createdAt ? -1 : 1;
-      });
-      setEverydayTasks(everydayTasks);
+      const tasks = await getTasks();
+      if (tasks == null) {
+        throw new Error('No tasks found');
+      }
+      // tasks.sort((a, b) => {
+      //   return a.createdAt > b.createdAt ? -1 : 1;
+      // });
+      setTasks(tasks);
     } catch (e) {
       console.error(e);
-      setEverydayTasks(null);
-      setLoading(false);
-    }
-    try {
-      const dayTasks = (await getTasks('DayTask')) as DayTask[];
-      dayTasks.sort((a, b) => {
-        return a.createdAt > b.createdAt ? -1 : 1;
-      });
-      setDayTasks(dayTasks);
-    } catch (e) {
-      console.error(e);
-      setDayTasks(null);
+      setTasks(null);
       setLoading(false);
     }
 
     setLoading(false);
   };
+
+  useEffect(() => {
+    if (!!session.data) {
+      fetchData();
+    }
+  }, []);
 
   useEffect(() => {
     if (!session.data) return;
@@ -59,12 +55,12 @@ export default function Dashboard() {
     title,
     createButtonText,
     createButtonLink,
-    content,
+    taskType,
   }: {
     title: string;
     createButtonText: string;
     createButtonLink: string;
-    content: JSX.Element;
+    taskType: TaskType;
   }) => {
     return (
       <div className='flex flex-col items-stretch w-[400px]'>
@@ -83,7 +79,17 @@ export default function Dashboard() {
             loading ? 'items-center' : 'items-strerch'
           } gap-3`}
           ref={animator}>
-          {content}
+          {(loading || !tasks) && <LoadingSpinner />}
+          {tasks &&
+            tasks.map(
+              (task, i) =>
+                task.taskType === taskType && (
+                  <TaskCard task={task} key={`${id}-${i}`} />
+                )
+            )}
+          {!!tasks && tasks.length == 0 && !loading && (
+            <p>There are no tasks for every day.</p>
+          )}
         </div>
       </div>
     );
@@ -115,44 +121,16 @@ export default function Dashboard() {
           <DashboardSection
             title='Daily Tasks'
             createButtonText='Create a new daily task'
-            createButtonLink='/create/everyday'
-            content={
-              <>
-                {(loading || !everydayTasks) && <LoadingSpinner />}
-                {everydayTasks &&
-                  everydayTasks.map((task, i) => (
-                    <TaskCard
-                      task={task}
-                      key={`${id}-${i}`}
-                      taskType='everydayTask'
-                    />
-                  ))}
-                {!!everydayTasks && everydayTasks.length == 0 && !loading && (
-                  <p>There are no tasks for every day.</p>
-                )}
-              </>
-            }></DashboardSection>
+            createButtonLink='/create/?type=everyday'
+            taskType={TaskType.EVERYDAY}
+          />
           {/* Today Section */}
           <DashboardSection
             title="Today's Tasks"
-            createButtonText='Create a new task for today'
-            createButtonLink='/create/day'
-            content={
-              <>
-                {(loading || !dayTasks) && <LoadingSpinner />}
-                {dayTasks &&
-                  dayTasks.map((task, i) => (
-                    <TaskCard
-                      task={task}
-                      key={`${id}-${i}`}
-                      taskType='dayTask'
-                    />
-                  ))}
-                {!!dayTasks && dayTasks.length == 0 && !loading && (
-                  <p>🎉 There are no tasks for today.</p>
-                )}
-              </>
-            }></DashboardSection>
+            createButtonText='Create a new task for Today'
+            createButtonLink='/create/?type=today'
+            taskType={TaskType.TODAY}
+          />
         </div>
       </div>
     </Layout>

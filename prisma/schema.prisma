@@ -41,15 +41,14 @@ model Session {
 }
 
 model User {
-  id            String         @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
-  email         String?        @unique
-  emailVerified DateTime?      @map("email_verified")
+  email         String?   @unique
+  emailVerified DateTime? @map("email_verified")
   image         String?
   accounts      Account[]
   sessions      Session[]
-  dayTasks      DayTask[]
-  everydayTasks EverydayTask[]
+  tasks         Task[]
 
   @@map("users")
 }
@@ -63,7 +62,7 @@ model VerificationToken {
   @@map("verificationtokens")
 }
 
-model EverydayTask {
+model Task {
   id          String   @id @default(cuid())
   name        String
   description String?
@@ -72,15 +71,10 @@ model EverydayTask {
   completed   Boolean  @default(false)
   user        User?    @relation(fields: [userId], references: [id])
   userId      String?
+  taskType    TaskType @default(TODAY)
 }
 
-model DayTask {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  completed   Boolean  @default(false)
-  user        User?    @relation(fields: [userId], references: [id])
-  userId      String?
+enum TaskType {
+  TODAY
+  EVERYDAY
 }

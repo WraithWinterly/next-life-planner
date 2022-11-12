@@ -1,10 +1,14 @@
 // This is an example of to protect an API route
 import { unstable_getServerSession } from 'next-auth/next';
-import { authOptions } from '../../auth/[...nextauth]';
-
-import { EverydayTask } from '@prisma/client';
+import { authOptions } from '../auth/[...nextauth]';
 
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { Task } from '@prisma/client';
+
+export interface GetTaskById {
+  type: 'DayTask' | 'EverydayTask';
+  id: string;
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -25,34 +29,37 @@ export default async function handler(
     return;
   }
 
-  const data = req.body.id as string;
+  const data = req.body as GetTaskById;
 
   if (!data) {
     res.status(400).send({ message: 'You need to specify an ID!' });
     return;
   }
 
-  // Create everydaytask and connect to user
-  const task = await prisma?.everydayTask.findUnique({
+  let foundTask: Task | null | undefined;
+
+  foundTask = await prisma?.task.findUnique({
     where: {
-      id: data,
+      id: data?.id,
     },
   });
+  proceedAfterTaskFound();
 
-  if (!task) {
-    res.status(404).send({ message: 'Task not found!' });
-    return;
-  }
+  function proceedAfterTaskFound() {
+    if (!foundTask) {
+      res.status(404).send({ message: 'Task not found!' });
+      return;
+    }
 
-  if (task?.userId !== session?.user.id) {
-    res.status(401).send({
-      message: 'You are not authorized to view this task.',
+    if (foundTask?.userId !== session?.user.id) {
+      res.status(401).send({
+        message: 'You are not authorized to view this task.',
+      });
+      return;
+    }
+
+    return res.send({
+      content: foundTask,
     });
-    return;
   }
-
-  return res.send({
-    content: task,
-  });
 }
-5;
