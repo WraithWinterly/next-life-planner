@@ -6,6 +6,7 @@ import { GetTaskById } from '../pages/api/v1/types';
 
 export const getTasks = async (): Promise<Task[]> => {
   const response = await apiResolver.get('/api/v1/getTasks');
+  console.log(response);
   return response.data.content as Task[];
 };
 
@@ -15,7 +16,7 @@ export const getTaskById = async (id: string): Promise<Task> => {
   };
 
   const response = await apiResolver.post('/api/v1/getTaskById', postData);
-  return response.data.content as Task;
+  return response.content as Task;
 };
 
 export interface CreateTaskData {

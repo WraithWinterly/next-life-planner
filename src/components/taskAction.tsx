@@ -11,6 +11,7 @@ import { useState } from 'react';
 
 import { ArrowLeftIcon, PlusIcon } from '@heroicons/react/24/outline';
 import ListBox from './ui-common/listBox';
+import { useUserContext } from '../userContext/userContext';
 
 function TaskAction({
   action,
@@ -28,7 +29,7 @@ function TaskAction({
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState(false);
   const router = useRouter();
-
+const ctx = useUserContext();
   useEffect(() => {
     if (action == 'edit' && !!editTaskData?.name) {
       setTaskData(editTaskData as Task);
@@ -60,7 +61,9 @@ function TaskAction({
     try {
       setLoading(true);
       createTask(taskData as CreateTaskData);
+      ctx.setRefetch(true);
       router.push('/dashboard');
+      
     } catch (error) {
       console.log(error);
       setLoading(false);
@@ -72,7 +75,7 @@ function TaskAction({
       setLoading(true);
 
       await updateTaskById(taskData);
-
+      ctx.setRefetch(true);
       router.push('/dashboard');
     } catch (error) {
       console.log(error);

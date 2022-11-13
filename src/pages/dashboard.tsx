@@ -6,19 +6,36 @@ import { getTasks } from '@utils/apiInterface';
 import TaskCard from '@components/dashboard/taskCard';
 
 import { signIn, useSession } from 'next-auth/react';
-import Router from 'next/router';
+import Router, { useRouter } from 'next/router';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/ui-common/loadingSpinner';
 import { Task, TaskType } from '@prisma/client';
+import { useUserContext } from '../userContext/userContext';
 
 export default function Dashboard() {
   const [animator] = useAutoAnimate<HTMLDivElement>();
-  const session = useSession();
+
   const [loading, setLoading] = useState(true);
 
   const [tasks, setTasks] = useState<Task[] | null>(null);
 
   const id = useId();
+
+  const router = useRouter();
+
+  const ctx = useUserContext();
+
+  const session = useSession();
+
+  useEffect(() => {
+    console.log('refetch', ctx.refetch);
+    console.log('signedIn', ctx.signedIn);
+    if (ctx.refetch && ctx.signedIn) {
+      console.log('fetch data');
+      fetchData();
+      ctx.setRefetch(false);
+    }
+  }, [ctx.refetch, ctx.signedIn]);
 
   const fetchData = async () => {
     try {
@@ -26,9 +43,7 @@ export default function Dashboard() {
       if (tasks == null) {
         throw new Error('No tasks found');
       }
-      // tasks.sort((a, b) => {
-      //   return a.createdAt > b.createdAt ? -1 : 1;
-      // });
+
       setTasks(tasks);
     } catch (e) {
       console.error(e);
@@ -38,18 +53,6 @@ export default function Dashboard() {
 
     setLoading(false);
   };
-
-  useEffect(() => {
-    if (!!session.data) {
-      fetchData();
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!session.data) return;
-    setLoading(true);
-    fetchData();
-  }, [session.data]);
 
   const DashboardSection = ({
     title,
@@ -95,7 +98,7 @@ export default function Dashboard() {
     );
   };
 
-  if (!session.data && session.status != 'loading') {
+  if (!ctx.signedIn && session.status != 'loading') {
     return (
       <Layout>
         <h1>You must be signed in to access this page.</h1>
