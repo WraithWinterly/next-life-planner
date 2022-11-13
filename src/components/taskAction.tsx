@@ -29,7 +29,7 @@ function TaskAction({
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState(false);
   const router = useRouter();
-const ctx = useUserContext();
+  const ctx = useUserContext();
   useEffect(() => {
     if (action == 'edit' && !!editTaskData?.name) {
       setTaskData(editTaskData as Task);
@@ -63,7 +63,6 @@ const ctx = useUserContext();
       createTask(taskData as CreateTaskData);
       ctx.setRefetch(true);
       router.push('/dashboard');
-      
     } catch (error) {
       console.log(error);
       setLoading(false);
@@ -136,8 +135,8 @@ const ctx = useUserContext();
         )}
 
         <div className='flex flex-col gap-3 items-center justify-center w-80'>
-          {action === 'create' && (
-            <div className='mt-4 flex flex-col gap-3 w-full'>
+          <div className='mt-4 flex flex-col gap-3 w-full'>
+            {action === 'create' && (
               <ListBox
                 label='Task Type'
                 defaultValueIndex={type === 'today' ? 0 : 1}
@@ -153,22 +152,23 @@ const ctx = useUserContext();
                   }
                 }}
               />
-              <InputField
-                name='Task Name'
-                target='name'
-                error={submitError}
-                maxLength={50}
-                handleChange={handleChange}
-              />
-              <InputField
-                name='Task Description'
-                target='description'
-                error={submitError}
-                maxLength={50}
-                handleChange={handleChange}
-              />
-            </div>
-          )}
+            )}
+
+            <InputField
+              name='Task Name'
+              target='name'
+              error={submitError}
+              maxLength={50}
+              handleChange={handleChange}
+            />
+            <InputField
+              name='Task Description'
+              target='description'
+              error={submitError}
+              maxLength={50}
+              handleChange={handleChange}
+            />
+          </div>
 
           <div className='mt-4 flex gap-3'>
             <button

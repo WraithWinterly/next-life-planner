@@ -25,7 +25,7 @@ export default async function handler(
     return;
   }
 
-  const data = req.body[0] as Task;
+  const data = req.body as Task;
 
   if (!data.name) {
     res.status(400).send({ message: 'Task name is required' });

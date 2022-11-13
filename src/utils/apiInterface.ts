@@ -34,9 +34,6 @@ export const createTask = async (postData: CreateTaskData): Promise<Task> => {
 };
 
 export const updateTaskById = async (postData: any): Promise<Task> => {
-  const response = await apiResolver.post(
-    '/api/v1/post/updateTaskById',
-    postData
-  );
+  const response = await apiResolver.post('/api/v1/updateTaskById', postData);
   return response.content as Task;
 };
