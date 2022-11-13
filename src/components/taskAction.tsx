@@ -1,9 +1,5 @@
 import LoadingScreen from '@components/ui-common/loadingScreen';
-import {
-  createTask,
-  CreateTaskData,
-  updateTaskById,
-} from '@utils/apiInterface';
+
 import { Task, TaskType } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -12,6 +8,7 @@ import { useState } from 'react';
 import { ArrowLeftIcon, PlusIcon } from '@heroicons/react/24/outline';
 import ListBox from './ui-common/listBox';
 import { useUserContext } from '../userContext/userContext';
+import { APICreateTask } from '../pages/api/v1/types';
 
 function TaskAction({
   action,
@@ -60,7 +57,7 @@ function TaskAction({
   const handleCreateTask = async () => {
     try {
       setLoading(true);
-      createTask(taskData as CreateTaskData);
+      ctx.api.createTask(taskData as APICreateTask);
       ctx.setRefetch(true);
       router.push('/dashboard');
     } catch (error) {
@@ -73,7 +70,7 @@ function TaskAction({
     try {
       setLoading(true);
 
-      await updateTaskById(taskData);
+      await ctx.api.updateTaskById(taskData);
       ctx.setRefetch(true);
       router.push('/dashboard');
     } catch (error) {

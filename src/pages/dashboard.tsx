@@ -1,7 +1,6 @@
 import { useEffect, useState, useId } from 'react';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import Layout from '@components/layout';
-import { getTasks } from '@utils/apiInterface';
 
 import TaskCard from '@components/dashboard/taskCard';
 
@@ -39,7 +38,7 @@ export default function Dashboard() {
 
   const fetchData = async () => {
     try {
-      const tasks = await getTasks();
+      const tasks = await ctx.api.getTasks();
       if (tasks == null) {
         throw new Error('No tasks found');
       }

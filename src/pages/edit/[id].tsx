@@ -1,5 +1,4 @@
 import LoadingScreen from '@components/ui-common/loadingScreen';
-import { getTaskById } from '@utils/apiInterface';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
@@ -7,15 +6,16 @@ import TaskAction from '@components/taskAction';
 import { useState } from 'react';
 import Layout from '@components/layout';
 import { Task } from '@prisma/client';
+import { useUserContext } from '@/src/userContext/userContext';
 
 function Edit() {
   const router = useRouter();
   const { id } = router.query;
-
+  const ctx = useUserContext();
   const [taskData, setTaskData] = useState<Task>();
 
   const fetchData = async (id: string) => {
-    const data = await getTaskById(id);
+    const data = await ctx.api.getTaskById(id);
     setTaskData(data);
   };
 
@@ -32,10 +32,7 @@ function Edit() {
   return (
     <Layout>
       {!!taskData ? (
-        <TaskAction
-          selectType={taskData.taskType}
-          action='edit'
-          editTaskData={taskData}></TaskAction>
+        <TaskAction action='edit' editTaskData={taskData}></TaskAction>
       ) : (
         <LoadingScreen text='Loading Task' />
       )}
