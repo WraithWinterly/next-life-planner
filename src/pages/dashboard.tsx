@@ -1,4 +1,4 @@
-import { useEffect, useState, useId } from 'react';
+import { useState, useId } from 'react';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import Layout from '@components/layout';
 

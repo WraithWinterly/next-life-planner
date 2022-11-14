@@ -1,5 +1,5 @@
 import { formatPrismaDate } from '@utils/dateHelper';
-import { Task, TaskType } from '@prisma/client';
+import { Task } from '@prisma/client';
 import Router from 'next/router';
 import { useState, Dispatch, SetStateAction } from 'react';
 import { TrashIcon } from '@heroicons/react/24/outline';

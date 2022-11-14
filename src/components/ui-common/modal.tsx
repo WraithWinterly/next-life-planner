@@ -1,5 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react';
-import { Fragment, useState, Dispatch, SetStateAction } from 'react';
+import { Fragment, Dispatch, SetStateAction } from 'react';
 
 interface ModalProps {
   title: string;

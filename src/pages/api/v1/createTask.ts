@@ -1,7 +1,7 @@
 import { unstable_getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
 
-import { Task, TaskType } from '@prisma/client';
+import { Task } from '@prisma/client';
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 import {

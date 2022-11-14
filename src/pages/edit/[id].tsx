@@ -9,7 +9,7 @@ import { Task } from '@prisma/client';
 import { useUserContext } from '@/src/userContext/userContext';
 
 function Edit() {
-  const router = useRouter()
+  const router = useRouter();
   const { id } = router.query;
   const ctx = useUserContext();
   const [taskData, setTaskData] = useState<Task | null>();
@@ -32,7 +32,7 @@ function Edit() {
   return (
     <Layout>
       {!!taskData ? (
-        <TaskAction action='edit' editTaskData={taskData}></TaskAction>
+        <TaskAction action='edit' editTaskData={taskData} />
       ) : (
         <LoadingScreen text='Loading Task' />
       )}
