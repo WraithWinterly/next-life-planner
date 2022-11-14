@@ -10,13 +10,12 @@ import ListBox from './ui-common/listBox';
 import { useUserContext } from '../userContext/userContext';
 import { APICreateTask } from '../pages/api/v1/types';
 
-function TaskAction({
-  action,
-  editTaskData,
-}: {
+interface TaskActionProps {
   action: 'create' | 'edit';
   editTaskData?: Task;
-}) {
+}
+
+function TaskAction({ action, editTaskData }: TaskActionProps) {
   const [taskData, setTaskData] = useState<Task>({
     name: '',
     description: '',
@@ -70,12 +69,14 @@ function TaskAction({
     name,
     target,
     error,
+    required,
     maxLength,
     handleChange,
   }: {
     name: string;
     target: 'name' | 'description';
     error: boolean;
+    required: boolean;
     maxLength: number;
     handleChange: (target: 'name' | 'description', e: any) => void;
   }) => {
@@ -84,7 +85,9 @@ function TaskAction({
         <label htmlFor='taskDescription' className='input-label'>
           {name}
         </label>
-        {error && <p className='text-red-600'>*This field is required.</p>}
+        {error && required && (
+          <p className='text-red-600'>*This field is required.</p>
+        )}
         <input
           className='input-field'
           id={name}
@@ -142,6 +145,7 @@ function TaskAction({
               name='Task Name'
               target='name'
               error={submitError}
+              required={true}
               maxLength={50}
               handleChange={handleChange}
             />
@@ -149,6 +153,7 @@ function TaskAction({
               name='Task Description'
               target='description'
               error={submitError}
+              required={false}
               maxLength={50}
               handleChange={handleChange}
             />

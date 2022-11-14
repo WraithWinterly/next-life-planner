@@ -2,54 +2,49 @@ import { unstable_getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
 
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { requirePost, requireSignIn } from '@/src/utils/apiUtils';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const session = await unstable_getServerSession(req, res, authOptions);
+  try {
+    const session = await unstable_getServerSession(req, res, authOptions);
 
-  if (req.method !== 'POST') {
-    res.status(405).send({ message: 'Only POST requests allowed.' });
-    return;
-  }
+    requirePost(req);
 
-  if (!session) {
-    res.status(401).send({
-      message:
-        'You must be signed in to view the protected content on this page.',
+    requireSignIn(session);
+
+    const id = req.body as string;
+
+    const taskData = await prisma?.task.findUnique({
+      where: {
+        id: id,
+      },
     });
-    return;
-  }
 
-  const id = req.body as string;
+    if (!taskData) {
+      res.status(400).send({ message: 'Task not found' });
+      return;
+    }
 
-  const taskData = await prisma?.task.findUnique({
-    where: {
-      id: id,
-    },
-  });
+    if (taskData?.userId !== session?.user.id) {
+      res.status(401).send({
+        message: 'You are not authorized to edit this task.',
+      });
+      return;
+    }
 
-  if (!taskData) {
-    res.status(400).send({ message: 'Task name is required' });
-    return;
-  }
-
-  if (taskData?.userId !== session?.user.id) {
-    res.status(401).send({
-      message: 'You are not authorized to edit this task.',
+    const task = await prisma?.task.delete({
+      where: {
+        id: id,
+      },
     });
-    return;
+
+    return res.send({
+      content: task,
+    });
+  } catch (error) {
+    return res.status(500).send({ message: (error as Error).message });
   }
-
-  const task = await prisma?.task.delete({
-    where: {
-      id: id,
-    },
-  });
-
-  return res.send({
-    content: task,
-  });
 }
-5;

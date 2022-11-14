@@ -3,6 +3,7 @@ import { authOptions } from '../auth/[...nextauth]';
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { Task } from '@prisma/client';
+import { requirePost, requireSignIn } from '@/src/utils/apiUtils';
 
 export interface GetTaskById {
   type: 'DayTask' | 'EverydayTask';
@@ -13,38 +14,27 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const session = await unstable_getServerSession(req, res, authOptions);
+  try {
+    const session = await unstable_getServerSession(req, res, authOptions);
 
-  if (req.method !== 'POST') {
-    res.status(405).send({ message: 'Only POST methods are allowed.' });
-    return;
-  }
+    requirePost(req);
+requireSignIn(session);
 
-  if (!session) {
-    res.status(401).send({
-      message:
-        'You must be signed in to view the protected content on this page.',
+    const data = req.body as GetTaskById;
+
+    if (!data) {
+      res.status(400).send({ message: 'You need to specify an ID!' });
+      return;
+    }
+
+    let foundTask: Task | null | undefined;
+
+    foundTask = await prisma?.task.findUnique({
+      where: {
+        id: data?.id,
+      },
     });
-    return;
-  }
 
-  const data = req.body as GetTaskById;
-
-  if (!data) {
-    res.status(400).send({ message: 'You need to specify an ID!' });
-    return;
-  }
-
-  let foundTask: Task | null | undefined;
-
-  foundTask = await prisma?.task.findUnique({
-    where: {
-      id: data?.id,
-    },
-  });
-  proceedAfterTaskFound();
-
-  function proceedAfterTaskFound() {
     if (!foundTask) {
       res.status(404).send({ message: 'Task not found!' });
       return;
@@ -60,5 +50,7 @@ export default async function handler(
     return res.send({
       content: foundTask,
     });
+  } catch (error) {
+    return res.status(500).send({ message: (error as Error).message });
   }
 }
