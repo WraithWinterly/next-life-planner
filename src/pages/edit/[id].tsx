@@ -9,13 +9,13 @@ import { Task } from '@prisma/client';
 import { useUserContext } from '@/src/userContext/userContext';
 
 function Edit() {
-  const router = useRouter();
+  const router = useRouter()
   const { id } = router.query;
   const ctx = useUserContext();
-  const [taskData, setTaskData] = useState<Task>();
+  const [taskData, setTaskData] = useState<Task | null>();
 
   const fetchData = async (id: string) => {
-    const data = await ctx.api.getTaskById(id);
+    const data = await ctx.getTaskById(id);
     setTaskData(data);
   };
 

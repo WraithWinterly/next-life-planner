@@ -14,6 +14,10 @@
     @apply bg-indigo-500 flex justify-center items-center cursor-pointer text-white rounded-md px-4 py-2 m-2 transition ease-out select-none hover:bg-indigo-700 focus:outline-none;
   }
 
+  .btn-danger {
+    @apply bg-red-500 hover:bg-red-600;
+  }
+
   .btn-lg {
     @apply text-xl pb-3;
   }

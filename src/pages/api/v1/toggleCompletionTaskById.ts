@@ -1,8 +1,6 @@
 import { unstable_getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
 
-import { Task } from '@prisma/client';
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(
@@ -24,13 +22,18 @@ export default async function handler(
     return;
   }
 
-  const data = req.body as Task;
+  const id = req.body as string;
 
   const taskData = await prisma?.task.findUnique({
     where: {
-      id: data.id,
+      id: id,
     },
   });
+
+  if (!taskData) {
+    res.status(400).send({ message: 'Task name is required' });
+    return;
+  }
 
   if (taskData?.userId !== session?.user.id) {
     res.status(401).send({
@@ -39,34 +42,17 @@ export default async function handler(
     return;
   }
 
-  if (!taskData?.name) {
-    res.status(400).send({ message: 'Task name is required' });
-    return;
-  }
-
-  if (!taskData?.id) {
-    res.status(400).send({ message: 'Invalid Task' });
-    return;
-  }
-
-  data.name = data.name.trim();
-
-  data.name = data.name.substring(0, 50);
-
-  if (!!data.description) {
-    data.description = data.description.trim();
-    data.description = data.description.substring(0, 400);
-  }
-
-  const task = await prisma?.task.update({
+  await prisma?.task.update({
     where: {
-      id: taskData.id,
+      id: id,
     },
-    data: data,
+    data: {
+      completed: !taskData.completed,
+    },
   });
 
   return res.send({
-    content: task,
+    content: true,
   });
 }
 5;

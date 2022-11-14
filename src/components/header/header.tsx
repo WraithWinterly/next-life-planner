@@ -27,7 +27,7 @@ export default function Header() {
           </Link>
 
           {!!session.data && (
-            <Link href='/dashboard' onClick={() => ctx.setRefetch(true)}>
+            <Link href='/dashboard'>
               <button className='btn h-12 gap-3'>
                 <div className='tw-btn-icon'>
                   <ChartBarSquareIcon aria-hidden='false' />

@@ -1,20 +1,35 @@
 import { formatPrismaDate } from '@utils/dateHelper';
 import { Task, TaskType } from '@prisma/client';
 import Router from 'next/router';
-import React from 'react';
+import { useState, Dispatch, SetStateAction } from 'react';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import Checkbox from '../ui-common/checkbox';
+import { useUserContext } from '@/src/userContext/userContext';
 
-function TaskCard({ task }: { task: Task }) {
-  const [checked, setChecked] = React.useState(task.completed);
+interface TaskCardProps {
+  task: Task;
+  setCurrentDeleteTask: Dispatch<SetStateAction<Task | null>>;
+  handleDeletePressed: () => void;
+}
+
+function TaskCard({
+  task,
+  setCurrentDeleteTask,
+  handleDeletePressed,
+}: TaskCardProps) {
+  const ctx = useUserContext();
+
+  const [checked, setChecked] = useState(task.completed);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(e.target.checked);
+    task.completed = e.target.checked;
+    ctx.toggleCompletionTaskById(task.id);
   };
 
   return (
     <div>
       <div
-        className={`flex flex-col items-start text-start p-4 max-w-sm rounded-lg border shadow-md bg-slate-800 border-slate-700 ${
+        className={`flex flex-col items-start text-start p-4 w-full rounded-lg border shadow-md bg-slate-800 border-slate-700 ${
           task.completed ? 'border-green-600' : 'border-yellow-600'
         }`}>
         <Checkbox label={task.name} value={checked} onChange={handleChange} />
@@ -44,7 +59,12 @@ function TaskCard({ task }: { task: Task }) {
                 clipRule='evenodd'></path>
             </svg>
           </button>
-          <button className='btn'>
+          <button
+            className='btn'
+            onClick={() => {
+              setCurrentDeleteTask(task);
+              handleDeletePressed();
+            }}>
             <TrashIcon className='w-6 h-6 text-red-500' />
           </button>
         </div>

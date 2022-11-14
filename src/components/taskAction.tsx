@@ -27,6 +27,7 @@ function TaskAction({
   const [submitError, setSubmitError] = useState(false);
   const router = useRouter();
   const ctx = useUserContext();
+
   useEffect(() => {
     if (action == 'edit' && !!editTaskData?.name) {
       setTaskData(editTaskData as Task);
@@ -34,17 +35,6 @@ function TaskAction({
   }, [editTaskData]);
 
   const { type } = router.query;
-  console.log(type);
-  useEffect(() => {
-    if (action == 'create') {
-      switch (type) {
-        case 'today':
-          taskData.taskType = TaskType.TODAY;
-        case 'everyday':
-          taskData.taskType = TaskType.EVERYDAY;
-      }
-    }
-  }, [type]);
 
   const handleChange = (target: 'name' | 'description', e: any) => {
     setTaskData((data: any) => {
@@ -57,8 +47,7 @@ function TaskAction({
   const handleCreateTask = async () => {
     try {
       setLoading(true);
-      ctx.api.createTask(taskData as APICreateTask);
-      ctx.setRefetch(true);
+      await ctx.createTask(taskData as APICreateTask);
       router.push('/dashboard');
     } catch (error) {
       console.log(error);
@@ -69,9 +58,7 @@ function TaskAction({
   const handleEditTask = async () => {
     try {
       setLoading(true);
-
-      await ctx.api.updateTaskById(taskData);
-      ctx.setRefetch(true);
+      await ctx.updateTask(taskData);
       router.push('/dashboard');
     } catch (error) {
       console.log(error);
@@ -136,7 +123,7 @@ function TaskAction({
             {action === 'create' && (
               <ListBox
                 label='Task Type'
-                defaultValueIndex={type === 'today' ? 0 : 1}
+                defaultValueIndex={type === TaskType.TODAY ? 0 : 1}
                 selections={[
                   'Create a task for only Today',
                   'Create a task for Everyday',

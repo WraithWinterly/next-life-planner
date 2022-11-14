@@ -10,13 +10,12 @@ import { PlusIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/ui-common/loadingSpinner';
 import { Task, TaskType } from '@prisma/client';
 import { useUserContext } from '../userContext/userContext';
+import Modal from '../components/ui-common/modal';
 
 export default function Dashboard() {
   const [animator] = useAutoAnimate<HTMLDivElement>();
 
   const [loading, setLoading] = useState(true);
-
-  const [tasks, setTasks] = useState<Task[] | null>(null);
 
   const id = useId();
 
@@ -26,32 +25,15 @@ export default function Dashboard() {
 
   const session = useSession();
 
-  useEffect(() => {
-    console.log('refetch', ctx.refetch);
-    console.log('signedIn', ctx.signedIn);
-    if (ctx.refetch && ctx.signedIn) {
-      console.log('fetch data');
-      fetchData();
-      ctx.setRefetch(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  const [currentDeleteTask, setCurrentDeleteTask] = useState<Task | null>(null);
+
+  const handleDeletePressed = () => {
+    if (currentDeleteTask != null) {
+      setDeleteModalOpen(true);
     }
-  }, [ctx.refetch, ctx.signedIn]);
-
-  const fetchData = async () => {
-    try {
-      const tasks = await ctx.api.getTasks();
-      if (tasks == null) {
-        throw new Error('No tasks found');
-      }
-
-      setTasks(tasks);
-    } catch (e) {
-      console.error(e);
-      setTasks(null);
-      setLoading(false);
-    }
-
-    setLoading(false);
-  };
+  }
 
   const DashboardSection = ({
     title,
@@ -78,18 +60,23 @@ export default function Dashboard() {
 
         <div
           className={`p-6 from-slate-800 to-slate-900 bg-gradient-to-br rounded-lg flex flex-col ${
-            loading ? 'items-center' : 'items-strerch'
+            !ctx.tasks ? 'items-center' : 'items-left'
           } gap-3`}
           ref={animator}>
-          {(loading || !tasks) && <LoadingSpinner />}
-          {tasks &&
-            tasks.map(
+          {!ctx.tasks && <LoadingSpinner />}
+          {!!ctx.tasks &&
+            ctx.tasks.map(
               (task, i) =>
                 task.taskType === taskType && (
-                  <TaskCard task={task} key={`${id}-${i}`} />
+                  <TaskCard
+                    task={task}
+                    handleDeletePressed={ handleDeletePressed }
+                    setCurrentDeleteTask={setCurrentDeleteTask}
+                    key={`${id}-${i}`}
+                  />
                 )
             )}
-          {!!tasks && tasks.length == 0 && !loading && (
+          {!!ctx.tasks && ctx.tasks.length == 0 && !loading && (
             <p>There are no tasks for every day.</p>
           )}
         </div>
@@ -116,6 +103,36 @@ export default function Dashboard() {
   }
   return (
     <Layout>
+      <Modal
+        title={`Delete ${currentDeleteTask?.name}?`}
+        open={deleteModalOpen}
+        setOpen={setDeleteModalOpen}>
+        <p>
+          {!!currentDeleteTask?.description ? (
+            `Description: ${currentDeleteTask?.description}`
+          ) : (
+            <em>No Description</em>
+          )}
+        </p>
+        <p>Are you sure you want to delete this task?</p>
+        <div className='flex mt-2 gap-2'>
+          <button
+            className='btn mx-0'
+            onClick={() => setDeleteModalOpen(false)}>
+            Cancel
+          </button>
+          {!!currentDeleteTask && (
+            <button
+              className='btn btn-danger'
+              onClick={async () => {
+                await ctx.deleteTaskById(currentDeleteTask!.id);
+                setDeleteModalOpen(false);
+              }}>
+              Delete
+            </button>
+          )}
+        </div>
+      </Modal>
       <h1 className='text-center'>Dashboard</h1>
       <div className='w-full flex justify-center page-anim'>
         <div className='flex justify-between w-[900px]'>
@@ -123,14 +140,14 @@ export default function Dashboard() {
           <DashboardSection
             title='Daily Tasks'
             createButtonText='Create a new daily task'
-            createButtonLink='/create/?type=everyday'
+            createButtonLink={`/create/?type=${TaskType.EVERYDAY}`}
             taskType={TaskType.EVERYDAY}
           />
           {/* Today Section */}
           <DashboardSection
             title="Today's Tasks"
             createButtonText='Create a new task for Today'
-            createButtonLink='/create/?type=today'
+            createButtonLink={`/create/?type=${TaskType.TODAY}`}
             taskType={TaskType.TODAY}
           />
         </div>

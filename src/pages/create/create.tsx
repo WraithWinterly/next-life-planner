@@ -8,7 +8,7 @@ import { TaskType } from '@prisma/client';
 function Create() {
   return (
     <Layout>
-      <TaskAction selectType={TaskType.TODAY} action='create'></TaskAction>
+      <TaskAction action='create'></TaskAction>
     </Layout>
   );
 }
