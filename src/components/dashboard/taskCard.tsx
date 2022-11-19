@@ -1,44 +1,75 @@
-import { formatPrismaDate } from '@utils/dateHelper';
-import { Task } from '@prisma/client';
+import { formatDate, FormatType } from '@utils/dateHelper';
+import { Task, TaskType } from '@prisma/client';
 import Router from 'next/router';
-import { useState, Dispatch, SetStateAction } from 'react';
+import { useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import Checkbox from '../ui-common/checkbox';
 import { useUserContext } from '@/src/userContext/userContext';
 
 interface TaskCardProps {
   task: Task;
+  selectedDate: Date | undefined;
   setCurrentDeleteTask: Dispatch<SetStateAction<Task | null>>;
   handleDeletePressed: () => void;
 }
 
 function TaskCard({
   task,
+  selectedDate,
   setCurrentDeleteTask,
   handleDeletePressed,
 }: TaskCardProps) {
   const ctx = useUserContext();
 
-  const [checked, setChecked] = useState(task.completed);
+  const [taskChecked, setTaskChecked] = useState<boolean>(false);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setChecked(e.target.checked);
-    task.completed = e.target.checked;
-    ctx.toggleCompletionTaskById(task.id);
+    // setTaskChecked(e.target.checked);
+    if (task.taskType === TaskType.TODAY) {
+      task.completed = e.target.checked;
+    }
+
+    ctx.toggleCompletionTask(
+      task.id,
+      e.target.checked,
+      task.taskType === TaskType.EVERYDAY ? selectedDate : undefined
+    );
   };
+
+  useEffect(() => {
+    if (!selectedDate) return;
+
+    setTaskChecked(
+      task.taskType === TaskType.TODAY
+        ? task.completed
+        : task.taskType === TaskType.EVERYDAY
+        ? task.everydayCompletedDates
+            .map((date) => formatDate(date, FormatType.YEAR_MONTH_DAY))
+            .includes(formatDate(selectedDate, FormatType.YEAR_MONTH_DAY))
+        : false
+    );
+  }, [task, selectedDate]);
 
   return (
     <div>
       <div
-        className={`flex flex-col items-start text-start p-4 w-full rounded-lg border shadow-md bg-slate-800 border-slate-700 ${
-          task.completed ? 'border-green-600' : 'border-yellow-600'
+        className={` slide-in-from-bottom-10 fade-in flex flex-col items-start text-start p-4 w-full rounded-lg border shadow-md bg-slate-800 border-slate-700 ${
+          taskChecked ? 'border-green-600' : 'border-yellow-600'
         }`}>
-        <Checkbox label={task.name} value={checked} onChange={handleChange} />
+        <Checkbox
+          label={task.name}
+          value={taskChecked}
+          onChange={handleChange}
+        />
         <h3 className='mb-3 font-normal break-words text-gray-400 w-full'>
           {task.description}
         </h3>
-        <h3 className='mb-3 font-normal text-gray-400'>
-          Created <b>{formatPrismaDate(task.createdAt)}</b>
-        </h3>
+
+        {task.taskType === TaskType.TODAY && (
+          <h3 className='mb-3 font-normal text-gray-400'>
+            Due <b>{formatDate(task.todayTaskDate)}</b>
+          </h3>
+        )}
 
         <div className='flex justify-start items-center'>
           <button

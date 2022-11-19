@@ -9,6 +9,7 @@ import { ArrowLeftIcon, PlusIcon } from '@heroicons/react/24/outline';
 import ListBox from './ui-common/listBox';
 import { useUserContext } from '../userContext/userContext';
 import { APICreateTask } from '../pages/api/v1/types';
+import { formatDate, FormatType } from '../utils/dateHelper';
 
 interface TaskActionProps {
   action: 'create' | 'edit';
@@ -157,6 +158,18 @@ function TaskAction({ action, editTaskData }: TaskActionProps) {
               maxLength={50}
               handleChange={handleChange}
             />
+            {taskData.taskType === TaskType.TODAY && (
+              <div>
+                <h3>Task Date</h3>
+                <p>
+                  {' '}
+                  {formatDate(
+                    taskData.todayTaskDate,
+                    FormatType.WITH_WEEKDAY_WITHOUT_TIME
+                  )}{' '}
+                </p>
+              </div>
+            )}
           </div>
 
           <div className='mt-4 flex gap-3'>

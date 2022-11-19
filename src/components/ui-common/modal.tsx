@@ -37,7 +37,7 @@ export default function Modal({ title, children, open, setOpen }: ModalProps) {
                 leave='ease-in duration-200'
                 leaveFrom='opacity-100 scale-100'
                 leaveTo='opacity-0 scale-95'>
-                <Dialog.Panel className='w-full max-w-md transform overflow-hidden rounded-2xl bg-indigo-800 bg-opacity-40 backdrop-blur-md p-6 text-left align-middle shadow-xl transition-all'>
+                <Dialog.Panel className='w-full max-w-md transform overflow-hidden rounded-2xl bg-slate-800 bg-opacity-40 backdrop-blur-md p-6 text-left align-middle shadow-xl transition-all border-2 border-solid border-slate-900'>
                   <Dialog.Title
                     as='h3'
                     className='text-lg font-medium leading-6 text-gray-200'>

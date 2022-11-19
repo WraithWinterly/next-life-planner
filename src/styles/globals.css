@@ -41,4 +41,8 @@
   .tw-btn-icon {
     @apply flex h-6 w-6 shrink-0 items-center justify-center text-white;
   }
+
+  .abs-center {
+    @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2;
+  }
 }

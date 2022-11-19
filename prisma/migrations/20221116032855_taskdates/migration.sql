@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Task" ADD COLUMN     "everydayCompletedDates" TIMESTAMP(3)[],
+ADD COLUMN     "todayTaskDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

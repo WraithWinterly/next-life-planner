@@ -1,4 +1,4 @@
-import { useState, useId } from 'react';
+import { useState, useEffect, useId } from 'react';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import Layout from '@components/layout';
 
@@ -6,14 +6,22 @@ import TaskCard from '@components/dashboard/taskCard';
 
 import { signIn, useSession } from 'next-auth/react';
 import Router, { useRouter } from 'next/router';
-import { PlusIcon } from '@heroicons/react/24/outline';
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  PlusIcon,
+} from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/ui-common/loadingSpinner';
 import { Task, TaskType } from '@prisma/client';
 import { useUserContext } from '../userContext/userContext';
 import Modal from '../components/ui-common/modal';
 
+import DatePickerModal from '../components/ui-common/datePickerModal';
+import autoAnimate from '@formkit/auto-animate';
+import { formatDate, FormatType } from '../utils/dateHelper';
+
 export default function Dashboard() {
-  const [animator] = useAutoAnimate<HTMLDivElement>();
+  const [element, enableAnimations] = useAutoAnimate<HTMLUListElement>();
 
   const [loading, setLoading] = useState(true);
 
@@ -29,11 +37,40 @@ export default function Dashboard() {
 
   const [currentDeleteTask, setCurrentDeleteTask] = useState<Task | null>(null);
 
+  const [dateModalOpen, setDateModalOpen] = useState(false);
+
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    new Date()
+  );
+
+  const [displayedTasks, setDisplayedTasks] = useState<Task[]>([]);
+
+  useEffect(() => {
+    if (!ctx.tasks) return;
+    setDisplayedTasks(() => {
+      let todaysTasks = ctx.tasks!.filter(
+        (task) => task.taskType === TaskType.TODAY
+      );
+      todaysTasks = todaysTasks.filter(
+        (task) => new Date(task.createdAt).getDate() === selectedDate?.getDate()
+      );
+      let everydayTasks = ctx.tasks!.filter(
+        (task) => task.taskType === TaskType.EVERYDAY
+      );
+      console.log(todaysTasks);
+      return [...todaysTasks, ...everydayTasks];
+    });
+  }, [ctx.tasks, selectedDate]);
+
   const handleDeletePressed = () => {
-    if (currentDeleteTask != null) {
-      setDeleteModalOpen(true);
-    }
-  }
+    setDeleteModalOpen(true);
+  };
+
+  // useEffect(() => {
+  //   if (currentDeleteTask != null && !deleteModalOpen) {
+  //     setDeleteModalOpen(true);
+  //   }
+  // }, [currentDeleteTask]);
 
   const DashboardSection = ({
     title,
@@ -60,24 +97,28 @@ export default function Dashboard() {
 
         <div
           className={`p-6 from-slate-800 to-slate-900 bg-gradient-to-br rounded-lg flex flex-col ${
-            !ctx.tasks ? 'items-center' : 'items-left'
-          } gap-3`}
-          ref={animator}>
+            !displayedTasks ? 'items-center' : 'items-left'
+          } gap-3`}>
           {!ctx.tasks && <LoadingSpinner />}
-          {!!ctx.tasks &&
-            ctx.tasks.map(
-              (task, i) =>
-                task.taskType === taskType && (
-                  <TaskCard
-                    task={task}
-                    handleDeletePressed={ handleDeletePressed }
-                    setCurrentDeleteTask={setCurrentDeleteTask}
-                    key={`${id}-${i}`}
-                  />
-                )
-            )}
-          {!!ctx.tasks && ctx.tasks.length == 0 && !loading && (
-            <p>There are no tasks for every day.</p>
+          {!!displayedTasks && (
+            <ul ref={element} className='flex flex-col gap-3'>
+              {displayedTasks.map(
+                (task, i) =>
+                  task.taskType === taskType && (
+                    <TaskCard
+                      task={task}
+                      selectedDate={selectedDate}
+                      handleDeletePressed={handleDeletePressed}
+                      setCurrentDeleteTask={setCurrentDeleteTask}
+                      key={`${id}-${i}`}
+                    />
+                  )
+              )}
+            </ul>
+          )}
+
+          {!!displayedTasks && displayedTasks.length == 0 && (
+            <p>There are no tasks here.</p>
           )}
         </div>
       </div>
@@ -86,7 +127,7 @@ export default function Dashboard() {
 
   if (!ctx.signedIn && session.status != 'loading') {
     return (
-      <Layout>
+      <Layout title='Dashboard'>
         <h1>You must be signed in to access this page.</h1>
         <div className='w-full flex justify-center'>
           <button
@@ -102,7 +143,7 @@ export default function Dashboard() {
     );
   }
   return (
-    <Layout>
+    <Layout title='Dashboard'>
       <Modal
         title={`Delete ${currentDeleteTask?.name}?`}
         open={deleteModalOpen}
@@ -133,7 +174,96 @@ export default function Dashboard() {
           )}
         </div>
       </Modal>
-      <h1 className='text-center'>Dashboard</h1>
+
+      {/* Date Section */}
+      <div>
+        <div className='flex flex-col items-center'>
+          {/* Top Section */}
+          <div className='flex justify-center items-center'>
+            {/* Left arrow */}
+            <button
+              className='btn'
+              onClick={() => {
+                if (!selectedDate) return;
+
+                setSelectedDate(
+                  (date) => new Date(date!.setDate(date!.getDate() - 1))
+                );
+              }}>
+              <div className='tw-btn-icon'>
+                <ArrowLeftIcon />
+              </div>
+            </button>
+            <button
+              className='btn w-72'
+              onClick={() => {
+                setDateModalOpen(true);
+              }}>
+              {/* {selectedDate && <h3>{selectedDate.toDateString()}</h3>} */}
+              {selectedDate && (
+                <h3>
+                  {formatDate(
+                    selectedDate,
+                    FormatType.WITH_WEEKDAY_WITHOUT_TIME
+                  )}
+                </h3>
+              )}
+            </button>
+
+            <button
+              className='btn'
+              onClick={() => {
+                if (!selectedDate) return;
+
+                setSelectedDate(
+                  (date) => new Date(date!.setDate(date!.getDate() + 1))
+                );
+              }}>
+              <div className='tw-btn-icon'>
+                <ArrowRightIcon />
+              </div>
+            </button>
+          </div>
+          <div className='flex justify-center items-center'>
+            <button
+              className='btn'
+              onClick={() => {
+                setSelectedDate(() => {
+                  const date = new Date();
+                  date.setDate(date.getDate() - 1);
+                  return date;
+                });
+              }}>
+              Yesterday
+            </button>
+            <button
+              className='btn'
+              onClick={() => {
+                setSelectedDate(new Date());
+              }}>
+              Today
+            </button>
+            <button
+              className='btn'
+              onClick={() => {
+                setSelectedDate(() => {
+                  const date = new Date();
+                  date.setDate(date.getDate() + 1);
+                  return date;
+                });
+              }}>
+              Tomorrow
+            </button>
+          </div>
+        </div>
+
+        <DatePickerModal
+          open={dateModalOpen}
+          setOpen={setDateModalOpen}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+        />
+      </div>
       <div className='w-full flex justify-center page-anim'>
         <div className='flex justify-between w-[900px]'>
           {/* Daily Task Section */}

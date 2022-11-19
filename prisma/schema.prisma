@@ -63,15 +63,17 @@ model VerificationToken {
 }
 
 model Task {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  completed   Boolean  @default(false)
-  user        User?    @relation(fields: [userId], references: [id])
-  userId      String?
-  taskType    TaskType @default(TODAY)
+  id                     String     @id @default(cuid())
+  name                   String
+  description            String?
+  createdAt              DateTime   @default(now())
+  updatedAt              DateTime   @updatedAt
+  completed              Boolean    @default(false)
+  user                   User?      @relation(fields: [userId], references: [id])
+  userId                 String?
+  everydayCompletedDates DateTime[]
+  todayTaskDate          DateTime   @default(now())
+  taskType               TaskType   @default(TODAY)
 }
 
 enum TaskType {

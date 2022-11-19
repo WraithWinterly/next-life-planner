@@ -5,6 +5,8 @@ import type { Session } from 'next-auth';
 import UserContext from '../userContext/userContext';
 import { useState } from 'react';
 
+import 'react-day-picker/dist/style.css';
+
 export default function App({
   Component,
   pageProps: { session, ...pageProps },
