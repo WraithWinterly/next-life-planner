@@ -158,15 +158,14 @@ function TaskAction({ action, editTaskData }: TaskActionProps) {
               maxLength={50}
               handleChange={handleChange}
             />
-            {taskData.taskType === TaskType.TODAY && (
-              <div>
+            {taskData.taskType === TaskType.TODAY && action === 'edit' && (
+              <div className='text-left'>
                 <h3>Task Date</h3>
                 <p>
-                  {' '}
                   {formatDate(
                     taskData.todayTaskDate,
                     FormatType.WITH_WEEKDAY_WITHOUT_TIME
-                  )}{' '}
+                  )}
                 </p>
               </div>
             )}

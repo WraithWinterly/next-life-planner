@@ -3,7 +3,7 @@ import Layout from '@components/layout';
 
 function Create() {
   return (
-    <Layout>
+    <Layout title='Create'>
       <TaskAction action='create' />
     </Layout>
   );
