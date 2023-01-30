@@ -97,11 +97,12 @@ const UserContext = ({ children }: { children: ReactNode }) => {
   };
 
   const deleteTaskById = async (id: string): Promise<TaskWithDates | null> => {
-    const response = await apiResolver.post('/api/v1/deleteTaskById', id);
     // delete task with this id
     if (!!tasks) {
       setTasks((tasks) => tasks!.filter((task) => task.id !== id));
     }
+
+    const response = await apiResolver.post('/api/v1/deleteTaskById', id);
 
     return response.content as TaskWithDates;
   };
