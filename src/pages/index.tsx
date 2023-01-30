@@ -5,6 +5,9 @@ export default function IndexPage() {
     <Layout title='Home'>
       <div className='flex flex-col items-center justify-center'>
         <h1>Welcome to Daily Planner</h1>
+        <h2>
+          <i>This app is in preview and is not complete.</i>
+        </h2>
         <h2>Not a Todo-list. Much, much more.</h2>
       </div>
     </Layout>
