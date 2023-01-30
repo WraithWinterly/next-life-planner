@@ -29,7 +29,8 @@ export default function SignIn({ providers }: any) {
                   onClick={() => {
                     setSigningIn(true);
                     signIn(provider.id, {
-                      callbackUrl: router.query.callbackUrl as string,
+                      callbackUrl: process.env
+                        .NEXT_PUBLIC_NEXTAUTH_URL as string,
                     });
                   }}>
                   {provider.name == 'GitHub' && <FaGithub></FaGithub>}
