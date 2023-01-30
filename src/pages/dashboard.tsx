@@ -1,11 +1,10 @@
 import { useState, useEffect, useId } from 'react';
-import { useAutoAnimate } from '@formkit/auto-animate/react';
 import Layout from '@components/layout';
 
 import TaskCard from '@components/dashboard/taskCard';
 
 import { signIn, useSession } from 'next-auth/react';
-import Router, { useRouter } from 'next/router';
+import Router from 'next/router';
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
@@ -19,15 +18,10 @@ import Modal from '../components/ui-common/modal';
 import DatePickerModal from '../components/ui-common/datePickerModal';
 import { formatDate, FormatType } from '../utils/dateHelper';
 import { TaskWithDates } from '../types/types';
+import { setDate } from 'date-fns';
 
 export default function Dashboard() {
-  const [element, enableAnimations] = useAutoAnimate<HTMLUListElement>();
-
-  const [loading, setLoading] = useState(true);
-
   const id = useId();
-
-  const router = useRouter();
 
   const ctx = useUserContext();
 
@@ -40,14 +34,16 @@ export default function Dashboard() {
 
   const [dateModalOpen, setDateModalOpen] = useState(false);
 
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    new Date()
-  );
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
   const [displayedTasks, setDisplayedTasks] = useState<TaskWithDates[]>([]);
 
   useEffect(() => {
     if (!ctx.tasks || ctx.tasks?.length < 1) return;
+    if (!selectedDate) return;
+
+    localStorage.setItem('selectedDate', JSON.stringify(selectedDate) || '');
+
     setDisplayedTasks(() => {
       let todaysTasks = ctx.tasks?.filter(
         (task) => task.taskType === TaskType.TODAY
@@ -63,15 +59,22 @@ export default function Dashboard() {
     });
   }, [ctx.tasks, selectedDate]);
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      let date = localStorage.getItem('selectedDate');
+      if (!!date) {
+        setSelectedDate(new Date(JSON.parse(date)));
+      } else {
+        setSelectedDate(new Date());
+      }
+      // cleanup
+      return () => clearTimeout(timeout);
+    }, 100);
+  }, []);
+
   const handleDeletePressed = () => {
     setDeleteModalOpen(true);
   };
-
-  // useEffect(() => {
-  //   if (currentDeleteTask != null && !deleteModalOpen) {
-  //     setDeleteModalOpen(true);
-  //   }
-  // }, [currentDeleteTask]);
 
   const DashboardSection = ({
     title,
@@ -100,6 +103,17 @@ export default function Dashboard() {
           className={`p-6 from-slate-800 to-slate-900 bg-gradient-to-br rounded-lg flex flex-col ${
             !displayedTasks ? 'items-center' : 'items-left'
           } gap-3`}>
+          {taskType === TaskType.TODAY &&
+            displayedTasks.filter((task) => task.taskType === TaskType.TODAY)
+              .length === 0 && (
+              <p className='mt-0 pt-0 items-start align-top'>
+                There are no tasks here.
+              </p>
+            )}
+
+          {taskType === TaskType.EVERYDAY &&
+            displayedTasks.filter((task) => task.taskType === TaskType.EVERYDAY)
+              .length === 0 && <p className=''>There are no tasks here.</p>}
           {!ctx.tasks && <LoadingSpinner />}
           {!!displayedTasks && displayedTasks.length > 0 && (
             <ul className='flex flex-col gap-3'>
@@ -117,10 +131,6 @@ export default function Dashboard() {
               )}
             </ul>
           )}
-
-          {!!displayedTasks && displayedTasks.length == 0 && (
-            <p>There are no tasks here.</p>
-          )}
         </div>
       </div>
     );
@@ -134,7 +144,6 @@ export default function Dashboard() {
           <button
             className='btn btn-lg'
             onClick={() => {
-              setLoading(true);
               signIn();
             }}>
             Sign In Now
@@ -196,7 +205,7 @@ export default function Dashboard() {
               </div>
             </button>
             <button
-              className='btn w-72'
+              className='btn w-72 h-10'
               onClick={() => {
                 setDateModalOpen(true);
               }}>
@@ -227,7 +236,13 @@ export default function Dashboard() {
           </div>
           <div className='flex justify-center items-center'>
             <button
-              className='btn'
+              className={`btn 
+              ${
+                selectedDate?.toDateString() ===
+                  new Date(
+                    new Date()!.setDate(new Date()!.getDate() - 1)
+                  ).toDateString() && 'bg-green-700 hover:bg-green-600'
+              }`}
               onClick={() => {
                 setSelectedDate(() => {
                   const date = new Date();
@@ -238,14 +253,24 @@ export default function Dashboard() {
               Yesterday
             </button>
             <button
-              className='btn'
+              className={`btn 
+              ${
+                selectedDate?.toDateString() === new Date().toDateString() &&
+                'bg-green-700 hover:bg-green-600'
+              }`}
               onClick={() => {
                 setSelectedDate(new Date());
               }}>
               Today
             </button>
             <button
-              className='btn'
+              className={`btn 
+              ${
+                selectedDate?.toDateString() ===
+                  new Date(
+                    new Date()!.setDate(new Date()!.getDate() + 1)
+                  ).toDateString() && 'bg-green-700 hover:bg-green-600'
+              }`}
               onClick={() => {
                 setSelectedDate(() => {
                   const date = new Date();

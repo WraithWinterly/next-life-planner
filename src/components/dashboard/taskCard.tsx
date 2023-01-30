@@ -23,6 +23,7 @@ function TaskCard({
   const ctx = useUserContext();
 
   const [taskChecked, setTaskChecked] = useState<boolean>(false);
+  const [canChange, setCanChange] = useState<boolean>(true);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTaskChecked(e.target.checked);
@@ -48,6 +49,10 @@ function TaskCard({
             .includes(formatDate(selectedDate, FormatType.YEAR_MONTH_DAY))
         : false
     );
+
+    if (task.taskType === TaskType.EVERYDAY) {
+      setCanChange(selectedDate.toDateString() === new Date().toDateString());
+    }
   }, [task, selectedDate]);
 
   return (
@@ -60,6 +65,8 @@ function TaskCard({
           label={task.name}
           value={taskChecked}
           onChange={handleChange}
+          canChange={canChange}
+          reason='You should only be able to check off tasks for the current day.'
         />
         <h3 className='mb-3 font-normal break-words text-gray-400 w-full'>
           {task.description}
