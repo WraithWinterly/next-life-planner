@@ -121,47 +121,59 @@ const UserContext = ({ children }: { children: ReactNode }) => {
       postData
     );
     if (!!response.content) {
+      const task = tasks?.filter((task) => task.id === id)[0];
       if (taskChecked) {
-        const task = tasks?.filter((task) => task.id === id)[0];
-        task?.everydayCompletedDates.push({
-          date: targetDate!.toISOString() as unknown as Date,
-        } as EverydayCompletedDate);
-        console.log(task?.everydayCompletedDates);
-        // setTasks((tasks) => [...(tasks || []), task!]);
-        setTasks((tasks) =>
-          tasks!.map((task) => {
-            if (task.id === id) {
-              task.everydayCompletedDates.push({
-                date: targetDate!,
-              } as EverydayCompletedDate);
-            }
-            return task;
-          })
-        );
+        if (task?.taskType === TaskType.EVERYDAY) {
+          task?.everydayCompletedDates.push({
+            date: targetDate!.toISOString() as unknown as Date,
+          } as EverydayCompletedDate);
+          setTasks((tasks) =>
+            tasks!.map((task) => {
+              if (task.id === id) {
+                task.everydayCompletedDates.push({
+                  date: targetDate!,
+                } as EverydayCompletedDate);
+              }
+              return task;
+            })
+          );
+        } else {
+          setTasks((tasks) =>
+            tasks!.map((task) => {
+              if (task.id === id) {
+                task.completed = taskChecked;
+              }
+              return task;
+            })
+          );
+        }
       } else {
-        // const task = tasks?.filter((task) => task.id === id)[0];
-        // if (!!task && !!targetDate) {
-        //   task.everydayCompletedDates = task.everydayCompletedDates.filter(
-        //     (date) =>
-        //       formatDate(date.date, FormatType.YEAR_MONTH_DAY) !==
-        //       formatDate(targetDate!, FormatType.YEAR_MONTH_DAY)
-        //   );
-        // }
-        // setTasks((tasks) => [...(tasks || []), task!]);
-        setTasks((tasks) =>
-          tasks!.map((task) => {
-            if (task.id === id) {
-              task.everydayCompletedDates = task.everydayCompletedDates.filter(
-                (everydayCompletedDate: EverydayCompletedDate) =>
-                  formatDate(
-                    everydayCompletedDate.date,
-                    FormatType.YEAR_MONTH_DAY
-                  ) !== formatDate(targetDate!, FormatType.YEAR_MONTH_DAY)
-              );
-            }
-            return task;
-          })
-        );
+        if (task?.taskType === TaskType.EVERYDAY) {
+          setTasks((tasks) =>
+            tasks!.map((task) => {
+              if (task.id === id) {
+                task.everydayCompletedDates =
+                  task.everydayCompletedDates.filter(
+                    (everydayCompletedDate: EverydayCompletedDate) =>
+                      formatDate(
+                        everydayCompletedDate.date,
+                        FormatType.YEAR_MONTH_DAY
+                      ) !== formatDate(targetDate!, FormatType.YEAR_MONTH_DAY)
+                  );
+              }
+              return task;
+            })
+          );
+        } else {
+          setTasks((tasks) =>
+            tasks!.map((task) => {
+              if (task.id === id) {
+                task.completed = taskChecked;
+              }
+              return task;
+            })
+          );
+        }
       }
     }
     return response.content as boolean;
