@@ -80,7 +80,7 @@ const UserContext = ({ children }: { children: ReactNode }) => {
     postData: CreateTaskData
   ): Promise<TaskWithDates> => {
     const response = await apiResolver.post('/api/v1/createTask', postData);
-    setTasks((tasks) => [...(tasks || []), response.content as TaskWithDates]);
+    setTasks((tasks) => [response.content as TaskWithDates, ...(tasks || [])]);
     return response.content as TaskWithDates;
   };
 

@@ -45,8 +45,9 @@ function TaskCard({
         ? task.completed
         : task.taskType === TaskType.EVERYDAY
         ? task.everydayCompletedDates
-            .map((date) => formatDate(date.date, FormatType.YEAR_MONTH_DAY))
-            .includes(formatDate(selectedDate, FormatType.YEAR_MONTH_DAY))
+            ?.map((date) => formatDate(date.date, FormatType.YEAR_MONTH_DAY))
+            .includes(formatDate(selectedDate, FormatType.YEAR_MONTH_DAY)) ||
+          false
         : false
     );
 
