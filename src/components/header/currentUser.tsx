@@ -48,7 +48,7 @@ export default function CurrentUser() {
   return (
     <>
       {loadingSignInOrOut && <LoadingScreen text='Redirecting' />}
-      <div className='w-full max-w-sm px-4 relative'>
+      <div className='w-full max-w-sm px-0 relative'>
         {!session && loading && (
           <a className='btn w-32 h-12'>
             <LoadingSpinner size={32} />
@@ -79,10 +79,10 @@ export default function CurrentUser() {
                   {session.user.image && (
                     <img
                       src={`${session.user.image}`}
-                      className='w-10 h-10 object-contain rounded-3xl mr-4'
+                      className='w-10 h-10 object-contain rounded-3xl md:mr-4'
                     />
                   )}
-                  <span>{session.user.name}</span>
+                  <span className='hidden md:block'>{session.user.name}</span>
                   <ChevronDownIcon
                     className={`${open ? '' : 'text-opacity-80'}
                   ml-2 h-5 w-5 text-white transition duration-150 ease-in-out group-hover:text-opacity-80`}
