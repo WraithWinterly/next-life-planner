@@ -7,12 +7,13 @@ import { useState } from 'react';
 import Layout from '@components/layout';
 import { Task } from '@prisma/client';
 import { useUserContext } from '@/src/userContext/userContext';
+import { TaskWithDates } from '@/src/types/types';
 
 function Edit() {
   const router = useRouter();
   const { id } = router.query;
   const ctx = useUserContext();
-  const [taskData, setTaskData] = useState<Task | null>();
+  const [taskData, setTaskData] = useState<TaskWithDates | null>();
 
   const fetchData = async (id: string) => {
     const data = await ctx.getTaskById(id);

@@ -1,11 +1,8 @@
-import { Task, TaskType } from '@prisma/client';
-import { fetchData } from 'next-auth/client/_utils';
+import { EverydayCompletedDate, Task, TaskType } from '@prisma/client';
 import { useSession } from 'next-auth/react';
 import {
   createContext,
-  Dispatch,
   ReactNode,
-  SetStateAction,
   useContext,
   useState,
   useEffect,
@@ -15,21 +12,22 @@ import {
   APIToggleCompletionTaskById,
   GetTaskById,
 } from '../pages/api/v1/types';
+import { TaskWithDates } from '../types/types';
 import apiResolver from '../utils/apiResolver';
 import { formatDate, FormatType } from '../utils/dateHelper';
 
 interface UserContextI {
-  getTasks: () => Promise<Task[] | null>;
-  getTaskById: (id: string) => Promise<Task | null>;
-  createTask: (task: APICreateTask) => Promise<Task | null>;
-  updateTask: (task: Task) => Promise<Task | null>;
-  deleteTaskById: (id: string) => Promise<Task | null>;
+  getTasks: () => Promise<TaskWithDates[] | null | undefined>;
+  getTaskById: (id: string) => Promise<TaskWithDates | null>;
+  createTask: (task: APICreateTask) => Promise<TaskWithDates | null>;
+  updateTask: (task: TaskWithDates) => Promise<TaskWithDates | null>;
+  deleteTaskById: (id: string) => Promise<TaskWithDates | null>;
   toggleCompletionTask: (
     id: string,
     taskChecked: boolean,
     targetDate: Date | undefined
   ) => Promise<boolean | null>;
-  tasks: Task[] | null;
+  tasks: TaskWithDates[] | null | undefined;
   signedIn: boolean;
 }
 
@@ -60,50 +58,52 @@ const UserContext = ({ children }: { children: ReactNode }) => {
 
   const [signedIn, setSignedIn] = useState(false);
 
-  const [tasks, setTasks] = useState<Task[] | null>(null);
+  const [tasks, setTasks] = useState<TaskWithDates[]>();
 
-  const getTasks = async (): Promise<Task[]> => {
+  const getTasks = async (): Promise<TaskWithDates[]> => {
     const response = await apiResolver.get('/api/v1/getTasks');
-    setTasks(response.data.content as Task[]);
+    setTasks(response.data.content as TaskWithDates[]);
 
-    return response.data.content as Task[];
+    return response.data.content as TaskWithDates[];
   };
 
-  const getTaskById = async (id: string): Promise<Task> => {
+  const getTaskById = async (id: string): Promise<TaskWithDates> => {
     const postData: GetTaskById = {
       id: id,
     };
 
     const response = await apiResolver.post('/api/v1/getTaskById', postData);
-    return response.content as Task;
+    return response.content as TaskWithDates;
   };
 
-  const createTask = async (postData: CreateTaskData): Promise<Task> => {
+  const createTask = async (
+    postData: CreateTaskData
+  ): Promise<TaskWithDates> => {
     const response = await apiResolver.post('/api/v1/createTask', postData);
-    setTasks((tasks) => [...(tasks || []), response.content as Task]);
-    return response.content as Task;
+    setTasks((tasks) => [...(tasks || []), response.content as TaskWithDates]);
+    return response.content as TaskWithDates;
   };
 
-  const updateTask = async (postData: any): Promise<Task> => {
+  const updateTask = async (postData: any): Promise<TaskWithDates> => {
     const response = await apiResolver.post('/api/v1/updateTaskById', postData);
     if (!!tasks) {
       setTasks((tasks) =>
         tasks!.map((task) =>
-          task.id === postData.id ? (response.content as Task) : task
+          task.id === postData.id ? (response.content as TaskWithDates) : task
         )
       );
     }
-    return response.content as Task;
+    return response.content as TaskWithDates;
   };
 
-  const deleteTaskById = async (id: string): Promise<Task | null> => {
+  const deleteTaskById = async (id: string): Promise<TaskWithDates | null> => {
     const response = await apiResolver.post('/api/v1/deleteTaskById', id);
     // delete task with this id
     if (!!tasks) {
       setTasks((tasks) => tasks!.filter((task) => task.id !== id));
     }
 
-    return response.content as Task;
+    return response.content as TaskWithDates;
   };
 
   const toggleCompletionTask = async (
@@ -122,41 +122,41 @@ const UserContext = ({ children }: { children: ReactNode }) => {
     );
     if (!!response.content) {
       if (taskChecked) {
-        // const task = tasks?.filter((task) => task.id === id)[0];
-        // task?.everydayCompletedDates.push(
-        //   targetDate!.toISOString() as unknown as Date
-        // );
-        // console.log(task?.everydayCompletedDates);
+        const task = tasks?.filter((task) => task.id === id)[0];
+        task?.everydayCompletedDates.push({
+          date: targetDate!.toISOString() as unknown as Date,
+        } as EverydayCompletedDate);
+        console.log(task?.everydayCompletedDates);
         // setTasks((tasks) => [...(tasks || []), task!]);
-
         setTasks((tasks) =>
           tasks!.map((task) => {
             if (task.id === id) {
-              task.everydayCompletedDates.push(targetDate!);
+              task.everydayCompletedDates.push({
+                date: targetDate!,
+              } as EverydayCompletedDate);
             }
             return task;
           })
         );
       } else {
         // const task = tasks?.filter((task) => task.id === id)[0];
-
         // if (!!task && !!targetDate) {
         //   task.everydayCompletedDates = task.everydayCompletedDates.filter(
         //     (date) =>
-        //       formatDate(date, FormatType.YEAR_MONTH_DAY) !==
+        //       formatDate(date.date, FormatType.YEAR_MONTH_DAY) !==
         //       formatDate(targetDate!, FormatType.YEAR_MONTH_DAY)
         //   );
         // }
-
         // setTasks((tasks) => [...(tasks || []), task!]);
-
         setTasks((tasks) =>
           tasks!.map((task) => {
             if (task.id === id) {
               task.everydayCompletedDates = task.everydayCompletedDates.filter(
-                (date) =>
-                  formatDate(date, FormatType.YEAR_MONTH_DAY) !==
-                  formatDate(targetDate!, FormatType.YEAR_MONTH_DAY)
+                (everydayCompletedDate: EverydayCompletedDate) =>
+                  formatDate(
+                    everydayCompletedDate.date,
+                    FormatType.YEAR_MONTH_DAY
+                  ) !== formatDate(targetDate!, FormatType.YEAR_MONTH_DAY)
               );
             }
             return task;

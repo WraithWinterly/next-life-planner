@@ -1,15 +1,16 @@
 import { formatDate, FormatType } from '@utils/dateHelper';
-import { Task, TaskType } from '@prisma/client';
+import { TaskType } from '@prisma/client';
 import Router from 'next/router';
 import { useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import Checkbox from '../ui-common/checkbox';
 import { useUserContext } from '@/src/userContext/userContext';
+import { TaskWithDates } from '@/src/types/types';
 
 interface TaskCardProps {
-  task: Task;
+  task: TaskWithDates;
   selectedDate: Date | undefined;
-  setCurrentDeleteTask: Dispatch<SetStateAction<Task | null>>;
+  setCurrentDeleteTask: Dispatch<SetStateAction<TaskWithDates | null>>;
   handleDeletePressed: () => void;
 }
 
@@ -24,11 +25,10 @@ function TaskCard({
   const [taskChecked, setTaskChecked] = useState<boolean>(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // setTaskChecked(e.target.checked);
+    setTaskChecked(e.target.checked);
     if (task.taskType === TaskType.TODAY) {
       task.completed = e.target.checked;
     }
-
     ctx.toggleCompletionTask(
       task.id,
       e.target.checked,
@@ -44,7 +44,7 @@ function TaskCard({
         ? task.completed
         : task.taskType === TaskType.EVERYDAY
         ? task.everydayCompletedDates
-            .map((date) => formatDate(date, FormatType.YEAR_MONTH_DAY))
+            .map((date) => formatDate(date.date, FormatType.YEAR_MONTH_DAY))
             .includes(formatDate(selectedDate, FormatType.YEAR_MONTH_DAY))
         : false
     );

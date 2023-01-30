@@ -12,13 +12,13 @@ import {
   PlusIcon,
 } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/ui-common/loadingSpinner';
-import { Task, TaskType } from '@prisma/client';
+import { TaskType } from '@prisma/client';
 import { useUserContext } from '../userContext/userContext';
 import Modal from '../components/ui-common/modal';
 
 import DatePickerModal from '../components/ui-common/datePickerModal';
-import autoAnimate from '@formkit/auto-animate';
 import { formatDate, FormatType } from '../utils/dateHelper';
+import { TaskWithDates } from '../types/types';
 
 export default function Dashboard() {
   const [element, enableAnimations] = useAutoAnimate<HTMLUListElement>();
@@ -35,7 +35,8 @@ export default function Dashboard() {
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
-  const [currentDeleteTask, setCurrentDeleteTask] = useState<Task | null>(null);
+  const [currentDeleteTask, setCurrentDeleteTask] =
+    useState<TaskWithDates | null>(null);
 
   const [dateModalOpen, setDateModalOpen] = useState(false);
 
@@ -43,22 +44,22 @@ export default function Dashboard() {
     new Date()
   );
 
-  const [displayedTasks, setDisplayedTasks] = useState<Task[]>([]);
+  const [displayedTasks, setDisplayedTasks] = useState<TaskWithDates[]>([]);
 
   useEffect(() => {
-    if (!ctx.tasks) return;
+    if (!ctx.tasks || ctx.tasks?.length < 1) return;
     setDisplayedTasks(() => {
-      let todaysTasks = ctx.tasks!.filter(
+      let todaysTasks = ctx.tasks?.filter(
         (task) => task.taskType === TaskType.TODAY
       );
-      todaysTasks = todaysTasks.filter(
+      todaysTasks = todaysTasks?.filter(
         (task) => new Date(task.createdAt).getDate() === selectedDate?.getDate()
       );
-      let everydayTasks = ctx.tasks!.filter(
+      let everydayTasks = ctx.tasks?.filter(
         (task) => task.taskType === TaskType.EVERYDAY
       );
-      console.log(todaysTasks);
-      return [...todaysTasks, ...everydayTasks];
+
+      return [...(todaysTasks || []), ...(everydayTasks || [])];
     });
   }, [ctx.tasks, selectedDate]);
 
@@ -100,8 +101,8 @@ export default function Dashboard() {
             !displayedTasks ? 'items-center' : 'items-left'
           } gap-3`}>
           {!ctx.tasks && <LoadingSpinner />}
-          {!!displayedTasks && (
-            <ul ref={element} className='flex flex-col gap-3'>
+          {!!displayedTasks && displayedTasks.length > 0 && (
+            <ul className='flex flex-col gap-3'>
               {displayedTasks.map(
                 (task, i) =>
                   task.taskType === taskType && (

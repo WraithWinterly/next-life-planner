@@ -1,4 +1,4 @@
-import { Task, TaskType } from '@prisma/client';
+import { TaskType } from '@prisma/client';
 
 export interface GetTaskById {
   id: string;

@@ -1,6 +1,6 @@
 import LoadingScreen from '@components/ui-common/loadingScreen';
 
-import { Task, TaskType } from '@prisma/client';
+import { TaskType } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { useState } from 'react';
@@ -10,18 +10,19 @@ import ListBox from './ui-common/listBox';
 import { useUserContext } from '../userContext/userContext';
 import { APICreateTask } from '../pages/api/v1/types';
 import { formatDate, FormatType } from '../utils/dateHelper';
+import { TaskWithDates } from '../types/types';
 
 interface TaskActionProps {
   action: 'create' | 'edit';
-  editTaskData?: Task;
+  editTaskData?: TaskWithDates;
 }
 
 function TaskAction({ action, editTaskData }: TaskActionProps) {
-  const [taskData, setTaskData] = useState<Task>({
+  const [taskData, setTaskData] = useState<TaskWithDates>({
     name: '',
     description: '',
     taskType: TaskType.TODAY,
-  } as Task);
+  } as TaskWithDates);
 
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState(false);
@@ -30,7 +31,7 @@ function TaskAction({ action, editTaskData }: TaskActionProps) {
 
   useEffect(() => {
     if (action == 'edit' && !!editTaskData?.name) {
-      setTaskData(editTaskData as Task);
+      setTaskData(editTaskData as TaskWithDates);
     }
   }, [editTaskData]);
 

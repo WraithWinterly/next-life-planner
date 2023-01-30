@@ -1,30 +1,31 @@
-import { unstable_getServerSession } from 'next-auth/next';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
-
-import { Task } from '@prisma/client';
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import {
   ensureProperTaskData,
   requirePost,
   requireSignIn,
 } from '@/src/utils/apiUtils';
+import { TaskWithDates } from '@/src/types/types';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   try {
-    const session = await unstable_getServerSession(req, res, authOptions);
+    const session = await getServerSession(req, res, authOptions);
 
     requirePost(req);
     requireSignIn(session);
 
-    const data = req.body as Task;
+    const data = req.body as TaskWithDates;
 
     const taskData = await prisma?.task.findUnique({
       where: {
         id: data.id,
+      },
+      include: {
+        everydayCompletedDates: true,
       },
     });
 
@@ -47,11 +48,21 @@ export default async function handler(
 
     const fixedData = ensureProperTaskData(data);
 
+    const dataWithoutEverydayCompletedDates = {
+      ...fixedData,
+      everydayCompletedDates: undefined,
+    };
+
     const task = await prisma?.task.update({
       where: {
         id: taskData.id,
       },
-      data: fixedData,
+      include: {
+        everydayCompletedDates: true,
+      },
+      data: {
+        ...dataWithoutEverydayCompletedDates,
+      },
     });
 
     return res.send({

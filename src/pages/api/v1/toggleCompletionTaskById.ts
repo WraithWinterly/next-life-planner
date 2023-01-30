@@ -1,10 +1,9 @@
-import { unstable_getServerSession } from 'next-auth/next';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { requirePost, requireSignIn } from '@/src/utils/apiUtils';
 import { TaskType } from '@prisma/client';
-import { getDate } from 'date-fns';
 import { APIToggleCompletionTaskById } from './types';
 import { formatDate, FormatType } from '@/src/utils/dateHelper';
 
@@ -13,18 +12,19 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const session = await unstable_getServerSession(req, res, authOptions);
+    const session = await getServerSession(req, res, authOptions);
 
     requirePost(req);
     requireSignIn(session);
 
     const reqData = req.body as APIToggleCompletionTaskById;
 
-    console.log(reqData);
-
     const taskData = await prisma?.task.findUnique({
       where: {
         id: reqData.id,
+      },
+      include: {
+        everydayCompletedDates: true,
       },
     });
 
@@ -52,10 +52,6 @@ export default async function handler(
     }
 
     if (taskData.taskType === TaskType.EVERYDAY) {
-      console.log(
-        'Every day task pending update: ',
-        taskData.everydayCompletedDates
-      );
       if (reqData.completed) {
         await prisma?.task.update({
           where: {
@@ -63,7 +59,9 @@ export default async function handler(
           },
           data: {
             everydayCompletedDates: {
-              push: reqData.targetDate,
+              create: {
+                date: reqData.targetDate!,
+              },
             },
           },
         });
@@ -71,25 +69,27 @@ export default async function handler(
         if (!reqData.targetDate) {
           throw new Error('No Target Date!');
         }
-        await prisma?.task.update({
+
+        // get all dates for task
+        const allDatesForTask = await prisma?.everydayCompletedDate.findMany({
           where: {
-            id: reqData.id,
+            taskId: reqData.id,
           },
-          data: {
-            everydayCompletedDates: {
-              set: taskData.everydayCompletedDates.filter(
-                (date) =>
-                  formatDate(date, FormatType.YEAR_MONTH_DAY) !==
-                  formatDate(reqData.targetDate!, FormatType.YEAR_MONTH_DAY)
-              ),
-            },
+        });
+
+        // find this day
+        allDatesForTask?.filter((date) => {
+          formatDate(date.date, FormatType.YEAR_MONTH_DAY) ===
+            formatDate(reqData.targetDate!, FormatType.YEAR_MONTH_DAY);
+        });
+
+        //delete it
+        await prisma?.everydayCompletedDate.delete({
+          where: {
+            id: allDatesForTask![0].id,
           },
         });
       }
-      console.log(
-        'Every day task data updated: ',
-        taskData.everydayCompletedDates
-      );
     }
 
     return res.send({

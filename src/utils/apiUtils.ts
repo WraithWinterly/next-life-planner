@@ -1,6 +1,7 @@
 import { Task, TaskType } from '@prisma/client';
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiRequest } from 'next';
 import { Session } from 'next-auth';
+import { TaskWithDates } from '../types/types';
 
 export const requirePost = (req: NextApiRequest) => {
   if (req.method !== 'POST') {
@@ -16,7 +17,9 @@ export const requireSignIn = (session: Session | null) => {
   return true;
 };
 
-export const ensureProperTaskData = (data: Task): Task => {
+export const ensureProperTaskData = (
+  data: TaskWithDates | Task
+): TaskWithDates | Task => {
   let fixedData = data;
   fixedData.name = fixedData.name.trim();
   fixedData.name = fixedData.name.substring(0, 50);

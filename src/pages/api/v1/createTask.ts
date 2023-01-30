@@ -1,4 +1,4 @@
-import { unstable_getServerSession } from 'next-auth/next';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
 
 import { Task } from '@prisma/client';
@@ -15,14 +15,14 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const session = await unstable_getServerSession(req, res, authOptions);
+    const session = await getServerSession(req, res, authOptions);
 
     requirePost(req);
     requireSignIn(session);
 
     const data = req.body as Task;
 
-    let fixedData = ensureProperTaskData(data);
+    let fixedData = ensureProperTaskData(data) as Task;
 
     // Create everydaytask and connect to user
     const task = await prisma?.task.create({
