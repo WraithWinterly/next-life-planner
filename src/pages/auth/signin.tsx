@@ -28,7 +28,10 @@ export default function SignIn({ providers }: any) {
                   className='flex btn btn-lg justify-start items-center gap-3'
                   onClick={() => {
                     setSigningIn(true);
-                    signIn(provider.id);
+                    signIn(provider.id, {
+                      callbackUrl: process.env
+                        .NEXT_PUBLIC_NEXTAUTH_URL as string,
+                    });
                   }}>
                   {provider.name == 'GitHub' && <FaGithub></FaGithub>}
                   <div className='pb-[2px]'>Sign in with {provider.name}</div>
