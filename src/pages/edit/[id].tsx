@@ -31,7 +31,7 @@ function Edit() {
   }, [id]);
 
   return (
-    <Layout title='Edit'>
+    <Layout title=''>
       {!!taskData ? (
         <TaskAction action='edit' editTaskData={taskData} />
       ) : (

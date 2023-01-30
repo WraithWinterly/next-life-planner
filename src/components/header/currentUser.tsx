@@ -1,6 +1,6 @@
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
-import Router from 'next/router';
+import Router, { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import { Popover, Transition } from '@headlessui/react';
@@ -24,6 +24,7 @@ export default function CurrentUser() {
   const { data: session, status } = useSession();
   const loading = status === 'loading';
   const [loadingSignInOrOut, setLoadingSignInOrOut] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setWasSigningIn(!session);
@@ -75,7 +76,11 @@ export default function CurrentUser() {
                 <Popover.Button
                   className={`
                 ${open ? ' bg-indigo-800' : 'text-opacity-90'}
-                btn`}>
+                btn ${
+                  router.pathname === '/profile'
+                    ? 'bg-green-700 hover:bg-green-600'
+                    : ''
+                }`}>
                   {session.user.image && (
                     <img
                       src={`${session.user.image}`}
@@ -99,12 +104,12 @@ export default function CurrentUser() {
                   leaveTo='opacity-0 translate-y-1'>
                   <Popover.Panel className='absolute transform px-4 sm:px-0 lg:max-w-3xl w-64 text-white'>
                     <div className='overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5'>
-                      <div className='relative grid gap-8 from-slate-700 to-slate-800 bg-gradient-to-tl p-7 lg:grid-cols-1'>
+                      <div className='relative grid gap-8 from-slate-800 to-zinc-800 bg-gradient-to-br p-7 lg:grid-cols-1'>
                         {menuOptions.map((item) => (
                           <button
                             key={item.name}
                             onClick={item.action}
-                            className='-m-3 flex items-center rounded-lg p-2 transition duration-150 ease-in-out hover:bg-slate-600 focus:outline-none focus-visible:ring focus-visible:ring-slate-500 focus-visible:ring-opacity-50'>
+                            className='-m-3 flex items-center rounded-lg p-2 transition duration-150 ease-in-out hover:bg-gray-700 focus:outline-none focus-visible:ring focus-visible:ring-slate-500 focus-visible:ring-opacity-50'>
                             <div className='flex h-10 w-10 shrink-0 items-center justify-center text-white sm:h-12 sm:w-12'>
                               <item.icon aria-hidden='true' />
                             </div>

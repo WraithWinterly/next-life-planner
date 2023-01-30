@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+.rdp-day_today {
+  color: #16a34a !important;
+  background-color: #0000 !important;
+}
+
+.rdp-day_today:hover {
+  color: #16a34a !important;
+}
+
+.rdp-button:hover:not([disabled]) {
+  color: white;
+  background-color: #4e46e57f !important;
+}
+
 @layer components {
   h1 {
     @apply text-4xl font-bold py-4;

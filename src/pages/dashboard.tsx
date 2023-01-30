@@ -138,25 +138,26 @@ export default function Dashboard() {
                   (date) => new Date(date!.setDate(date!.getDate() - 1))
                 );
               }}>
-              <div className='tw-btn-icon'>
-                <ArrowLeftIcon />
+              <div className='tw-btn-icon w-24 md:w-8'>
+                <ArrowLeftIcon className='w-8' />
               </div>
             </button>
-            <button
-              className='btn md:w-72 w-full h-10 order-first md:order-2'
-              onClick={() => {
-                setDateModalOpen(true);
-              }}>
-              {/* {selectedDate && <h3>{selectedDate.toDateString()}</h3>} */}
-              {selectedDate && (
-                <h3>
-                  {formatDate(
-                    selectedDate,
-                    FormatType.WITH_WEEKDAY_WITHOUT_TIME
-                  )}
-                </h3>
-              )}
-            </button>
+            <div className='md:w-72 w-full order-first md:order-2'>
+              <button
+                className='btn w-72 mx-auto px-0 py-2 m-0'
+                onClick={() => {
+                  setDateModalOpen(true);
+                }}>
+                {selectedDate && (
+                  <h3>
+                    {formatDate(
+                      selectedDate,
+                      FormatType.WITH_WEEKDAY_WITHOUT_TIME
+                    )}
+                  </h3>
+                )}
+              </button>
+            </div>
 
             <button
               className='btn order-2 md:order-3'
@@ -167,8 +168,8 @@ export default function Dashboard() {
                   (date) => new Date(date!.setDate(date!.getDate() + 1))
                 );
               }}>
-              <div className='tw-btn-icon'>
-                <ArrowRightIcon />
+              <div className='tw-btn-icon  w-24 md:w-8'>
+                <ArrowRightIcon className='w-8' />
               </div>
             </button>
           </div>
@@ -229,7 +230,7 @@ export default function Dashboard() {
         />
       </div>
       <div className='w-full flex justify-center page-anim'>
-        <div className='flex md:flex-row gap-2 flex-col justify-between max-w-[900px] px-1'>
+        <div className='flex md:flex-row lg:gap-8 gap-4 flex-col justify-between max-w-[900px] px-1'>
           {/* Daily Task Section */}
           <DashboardSection
             displayedTasks={displayedTasks}
@@ -285,7 +286,7 @@ const DashboardSection = ({
     <div className='flex flex-col items-stretch md:w-[360px]'>
       <h2>{title}</h2>
       <button
-        className='btn h-12 gap-2'
+        className='btn h-12 gap-2 mb-4 mx-0'
         onClick={() => Router.push(createButtonLink)}>
         <p>{createButtonText}</p>
         <div className='tw-btn-icon'>
@@ -294,7 +295,7 @@ const DashboardSection = ({
       </button>
 
       <div
-        className={`p-6 from-slate-800 to-slate-900 bg-gradient-to-br rounded-lg flex flex-col ${
+        className={`p-6 from-slate-800 to-slate-900 bg-gradient-to-br h-full rounded-lg flex flex-col ${
           !displayedTasks ? 'items-center' : 'items-left'
         } gap-3`}>
         {taskType === TaskType.TODAY &&
