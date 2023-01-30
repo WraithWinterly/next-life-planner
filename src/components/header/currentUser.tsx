@@ -11,6 +11,7 @@ import {
 } from '@heroicons/react/20/solid';
 import { Fragment } from 'react';
 import LoadingScreen from '../ui-common/loadingScreen';
+import LoadingSpinner from '../ui-common/loadingSpinner';
 
 interface MenuOptions {
   name: string;
@@ -48,6 +49,11 @@ export default function CurrentUser() {
     <>
       {loadingSignInOrOut && <LoadingScreen text='Redirecting' />}
       <div className='w-full max-w-sm px-4 relative'>
+        {!session && loading && (
+          <a className='btn w-32 h-12'>
+            <LoadingSpinner size={32} />
+          </a>
+        )}
         {!session && !loading && (
           <a
             className='btn w-32 h-12'

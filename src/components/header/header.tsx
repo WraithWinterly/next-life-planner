@@ -8,8 +8,6 @@ interface HeaderProps {
   title: string | undefined;
 }
 export default function Header({ title }: HeaderProps) {
-  const ctx = useUserContext();
-
   const session = useSession();
   return (
     <header className='backdrop-blur-md bg-opacity-75 px-4 py-2 border-gray-600 border-b relative z-10'>
