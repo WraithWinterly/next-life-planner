@@ -59,7 +59,7 @@ function TaskCard({
   return (
     <div>
       <div
-        className={` slide-in-from-bottom-10 fade-in flex flex-col items-start text-start p-4 w-full rounded-lg border shadow-md bg-slate-800 border-slate-700 ${
+        className={`slide-in-from-bottom-10 fade-in flex flex-col items-start text-start p-4 w-full rounded-lg border shadow-md bg-slate-800 border-slate-700 ${
           taskChecked ? 'border-green-600' : 'border-yellow-600'
         }`}>
         <Checkbox

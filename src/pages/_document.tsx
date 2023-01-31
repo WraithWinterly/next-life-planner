@@ -9,7 +9,7 @@ export default function Document() {
           href="..."
         /> */}
       </Head>
-      <body className='from-slate-700 to-slate-900 bg-gradient-to-tr text-gray-200 text-center mx-auto'>
+      <body className='h-full min-h-screen text-gray-200 text-center mx-auto'>
         <Main />
         <NextScript />
       </body>

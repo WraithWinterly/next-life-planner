@@ -1,8 +1,0 @@
-.selected:not([disabled]) {
-  /* font-weight: bold; */
-  /* border: 2px solid currentColor; */
-}
-.selected:hover:not([disabled]) {
-  border-color: blue;
-  color: blue;
-}

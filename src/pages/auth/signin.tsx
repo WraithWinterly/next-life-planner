@@ -11,14 +11,10 @@ export default function SignIn({ providers }: any) {
   const [signingIn, setSigningIn] = useState(false);
 
   return (
-    <div className='min-h-screen relative flex flex-col'>
-      <section className='text-center fixed-center'>
+    <div className='min-h-screen relative flex flex-col from-slate-900 to-zinc-800 bg-gradient-to-br px-2'>
+      <section className='text-center max-w-[600px] mx-auto'>
         <h1>Daily Planner</h1>
-        <div className='from-slate-800 to-slate-900 bg-gradient-to-r rounded-lg px-8 mt-2 py-8 flex'>
-          <img
-            src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg'
-            className='h-80'
-          />
+        <div className='from-slate-800 to-slate-900 bg-gradient-to-r rounded-lg px-8 mt-2 pb-8 pt-2 flex-col'>
           <div className='flex flex-col items-center mr-4'>
             <h1 className=''>Sign In to Continue</h1>
             {!!providers ? (
@@ -44,6 +40,10 @@ export default function SignIn({ providers }: any) {
               </h3>
             )}
           </div>
+          <img
+            src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg'
+            className='h-80 py-6'
+          />
         </div>
       </section>
       {signingIn && <LoadingScreen text='Signing In' />}

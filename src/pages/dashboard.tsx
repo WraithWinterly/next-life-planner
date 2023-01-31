@@ -14,15 +14,11 @@ import LoadingSpinner from '../components/ui-common/loadingSpinner';
 import { TaskType } from '@prisma/client';
 import { useUserContext } from '../userContext/userContext';
 import Modal from '../components/ui-common/modal';
-
 import DatePickerModal from '../components/ui-common/datePickerModal';
 import { formatDate, FormatType } from '../utils/dateHelper';
 import { TaskWithDates } from '../types/types';
-import { setDate } from 'date-fns';
 
 export default function Dashboard() {
-  const id = useId();
-
   const ctx = useUserContext();
 
   const session = useSession();
@@ -69,71 +65,11 @@ export default function Dashboard() {
       }
       // cleanup
       return () => clearTimeout(timeout);
-    }, 100);
+    }, 50);
   }, []);
 
   const handleDeletePressed = () => {
     setDeleteModalOpen(true);
-  };
-
-  const DashboardSection = ({
-    title,
-    createButtonText,
-    createButtonLink,
-    taskType,
-  }: {
-    title: string;
-    createButtonText: string;
-    createButtonLink: string;
-    taskType: TaskType;
-  }) => {
-    return (
-      <div className='flex flex-col items-stretch w-[400px]'>
-        <h2>{title}</h2>
-        <button
-          className='btn h-12 gap-2'
-          onClick={() => Router.push(createButtonLink)}>
-          <p>{createButtonText}</p>
-          <div className='tw-btn-icon'>
-            <PlusIcon />
-          </div>
-        </button>
-
-        <div
-          className={`p-6 from-slate-800 to-slate-900 bg-gradient-to-br rounded-lg flex flex-col ${
-            !displayedTasks ? 'items-center' : 'items-left'
-          } gap-3`}>
-          {taskType === TaskType.TODAY &&
-            displayedTasks.filter((task) => task.taskType === TaskType.TODAY)
-              .length === 0 && (
-              <p className='mt-0 pt-0 items-start align-top'>
-                There are no tasks here.
-              </p>
-            )}
-
-          {taskType === TaskType.EVERYDAY &&
-            displayedTasks.filter((task) => task.taskType === TaskType.EVERYDAY)
-              .length === 0 && <p className=''>There are no tasks here.</p>}
-          {!ctx.tasks && <LoadingSpinner />}
-          {!!displayedTasks && displayedTasks.length > 0 && (
-            <ul className='flex flex-col gap-3'>
-              {displayedTasks.map(
-                (task, i) =>
-                  task.taskType === taskType && (
-                    <TaskCard
-                      task={task}
-                      selectedDate={selectedDate}
-                      handleDeletePressed={handleDeletePressed}
-                      setCurrentDeleteTask={setCurrentDeleteTask}
-                      key={`${id}-${i}`}
-                    />
-                  )
-              )}
-            </ul>
-          )}
-        </div>
-      </div>
-    );
   };
 
   if (!ctx.signedIn && session.status != 'loading') {
@@ -189,10 +125,10 @@ export default function Dashboard() {
       <div>
         <div className='flex flex-col items-center'>
           {/* Top Section */}
-          <div className='flex justify-center items-center'>
+          <div className='flex mx-auto justify-center items-center'>
             {/* Left arrow */}
             <button
-              className='btn'
+              className='btn self-stretch'
               onClick={() => {
                 if (!selectedDate) return;
 
@@ -200,16 +136,16 @@ export default function Dashboard() {
                   (date) => new Date(date!.setDate(date!.getDate() - 1))
                 );
               }}>
-              <div className='tw-btn-icon'>
-                <ArrowLeftIcon />
+              <div className='tw-btn-icon w-14 md:w-8'>
+                <ArrowLeftIcon className='w-8' />
               </div>
             </button>
+
             <button
-              className='btn w-72 h-10'
+              className='btn mx-auto md:w-72'
               onClick={() => {
                 setDateModalOpen(true);
               }}>
-              {/* {selectedDate && <h3>{selectedDate.toDateString()}</h3>} */}
               {selectedDate && (
                 <h3>
                   {formatDate(
@@ -221,7 +157,7 @@ export default function Dashboard() {
             </button>
 
             <button
-              className='btn'
+              className='btn self-stretch'
               onClick={() => {
                 if (!selectedDate) return;
 
@@ -229,8 +165,8 @@ export default function Dashboard() {
                   (date) => new Date(date!.setDate(date!.getDate() + 1))
                 );
               }}>
-              <div className='tw-btn-icon'>
-                <ArrowRightIcon />
+              <div className='tw-btn-icon w-14 md:w-8'>
+                <ArrowRightIcon className='w-8' />
               </div>
             </button>
           </div>
@@ -291,9 +227,13 @@ export default function Dashboard() {
         />
       </div>
       <div className='w-full flex justify-center page-anim'>
-        <div className='flex justify-between w-[900px]'>
+        <div className='flex md:flex-row lg:gap-8 gap-4 flex-col justify-between max-w-[900px] px-1'>
           {/* Daily Task Section */}
           <DashboardSection
+            displayedTasks={displayedTasks}
+            handleDeletePressed={handleDeletePressed}
+            setCurrentDeleteTask={setCurrentDeleteTask}
+            selectedDate={selectedDate}
             title='Daily Tasks'
             createButtonText='Create a new daily task'
             createButtonLink={`/create/?type=${TaskType.EVERYDAY}`}
@@ -301,6 +241,10 @@ export default function Dashboard() {
           />
           {/* Today Section */}
           <DashboardSection
+            displayedTasks={displayedTasks}
+            handleDeletePressed={handleDeletePressed}
+            setCurrentDeleteTask={setCurrentDeleteTask}
+            selectedDate={selectedDate}
             title="Today's Tasks"
             createButtonText='Create a new task for Today'
             createButtonLink={`/create/?type=${TaskType.TODAY}`}
@@ -311,3 +255,75 @@ export default function Dashboard() {
     </Layout>
   );
 }
+
+import { Dispatch, SetStateAction } from 'react';
+
+const DashboardSection = ({
+  displayedTasks,
+  selectedDate,
+  handleDeletePressed,
+  setCurrentDeleteTask,
+  title,
+  createButtonText,
+  createButtonLink,
+  taskType,
+}: {
+  displayedTasks: TaskWithDates[];
+  selectedDate: Date | undefined;
+  handleDeletePressed: () => void;
+  setCurrentDeleteTask: Dispatch<SetStateAction<TaskWithDates | null>>;
+  title: string;
+  createButtonText: string;
+  createButtonLink: string;
+  taskType: TaskType;
+}) => {
+  const ctx = useUserContext();
+  const id = useId();
+  return (
+    <div className='flex flex-col items-stretch md:w-[360px]'>
+      <h2>{title}</h2>
+      <button
+        className='btn h-12 gap-2 mb-4 mx-0'
+        onClick={() => Router.push(createButtonLink)}>
+        <p>{createButtonText}</p>
+        <div className='tw-btn-icon'>
+          <PlusIcon />
+        </div>
+      </button>
+
+      <div
+        className={`p-6 from-slate-800 to-slate-900 bg-gradient-to-br h-full rounded-lg flex flex-col ${
+          !displayedTasks ? 'items-center' : 'items-left'
+        } gap-3`}>
+        {taskType === TaskType.TODAY &&
+          displayedTasks.filter((task) => task.taskType === TaskType.TODAY)
+            .length === 0 && (
+            <p className='mt-0 pt-0 items-start align-top'>
+              There are no tasks here.
+            </p>
+          )}
+
+        {taskType === TaskType.EVERYDAY &&
+          displayedTasks.filter((task) => task.taskType === TaskType.EVERYDAY)
+            .length === 0 && <p className=''>There are no tasks here.</p>}
+        {!ctx.tasks && <LoadingSpinner />}
+        {!!displayedTasks && displayedTasks.length > 0 && (
+          <ul className='flex flex-col gap-3'>
+            {displayedTasks.map(
+              (task, i) =>
+                task.taskType === taskType && (
+                  <TaskCard
+                    task={task}
+                    selectedDate={selectedDate}
+                    handleDeletePressed={handleDeletePressed}
+                    setCurrentDeleteTask={setCurrentDeleteTask}
+                    key={`${id}-${i}`}
+                  />
+                )
+            )}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+};
