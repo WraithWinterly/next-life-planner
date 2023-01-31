@@ -14,11 +14,9 @@ import LoadingSpinner from '../components/ui-common/loadingSpinner';
 import { TaskType } from '@prisma/client';
 import { useUserContext } from '../userContext/userContext';
 import Modal from '../components/ui-common/modal';
-
 import DatePickerModal from '../components/ui-common/datePickerModal';
 import { formatDate, FormatType } from '../utils/dateHelper';
 import { TaskWithDates } from '../types/types';
-import { setDate } from 'date-fns';
 
 export default function Dashboard() {
   const ctx = useUserContext();
@@ -67,7 +65,7 @@ export default function Dashboard() {
       }
       // cleanup
       return () => clearTimeout(timeout);
-    }, 100);
+    }, 50);
   }, []);
 
   const handleDeletePressed = () => {
@@ -127,10 +125,10 @@ export default function Dashboard() {
       <div>
         <div className='flex flex-col items-center'>
           {/* Top Section */}
-          <div className='flex w-full justify-center items-center flex-wrap'>
+          <div className='flex mx-auto justify-center items-center'>
             {/* Left arrow */}
             <button
-              className='btn order-2'
+              className='btn self-stretch'
               onClick={() => {
                 if (!selectedDate) return;
 
@@ -138,29 +136,28 @@ export default function Dashboard() {
                   (date) => new Date(date!.setDate(date!.getDate() - 1))
                 );
               }}>
-              <div className='tw-btn-icon w-24 md:w-8'>
+              <div className='tw-btn-icon w-14 md:w-8'>
                 <ArrowLeftIcon className='w-8' />
               </div>
             </button>
-            <div className='md:w-72 w-full order-first md:order-2'>
-              <button
-                className='btn w-72 mx-auto px-0 py-2 m-0'
-                onClick={() => {
-                  setDateModalOpen(true);
-                }}>
-                {selectedDate && (
-                  <h3>
-                    {formatDate(
-                      selectedDate,
-                      FormatType.WITH_WEEKDAY_WITHOUT_TIME
-                    )}
-                  </h3>
-                )}
-              </button>
-            </div>
 
             <button
-              className='btn order-2 md:order-3'
+              className='btn mx-auto md:w-72'
+              onClick={() => {
+                setDateModalOpen(true);
+              }}>
+              {selectedDate && (
+                <h3>
+                  {formatDate(
+                    selectedDate,
+                    FormatType.WITH_WEEKDAY_WITHOUT_TIME
+                  )}
+                </h3>
+              )}
+            </button>
+
+            <button
+              className='btn self-stretch'
               onClick={() => {
                 if (!selectedDate) return;
 
@@ -168,7 +165,7 @@ export default function Dashboard() {
                   (date) => new Date(date!.setDate(date!.getDate() + 1))
                 );
               }}>
-              <div className='tw-btn-icon  w-24 md:w-8'>
+              <div className='tw-btn-icon w-14 md:w-8'>
                 <ArrowRightIcon className='w-8' />
               </div>
             </button>

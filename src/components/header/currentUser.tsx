@@ -111,7 +111,7 @@ export default function CurrentUser() {
                             onClick={item.action}
                             className='-m-3 flex items-center rounded-lg p-2 transition duration-150 ease-in-out hover:bg-gray-700 focus:outline-none focus-visible:ring focus-visible:ring-slate-500 focus-visible:ring-opacity-50'>
                             <div className='flex h-10 w-10 shrink-0 items-center justify-center text-white sm:h-12 sm:w-12'>
-                              <item.icon aria-hidden='true' />
+                              <item.icon aria-hidden='true' className='w-16' />
                             </div>
                             <div className='ml-4'>
                               <p className='text-sm font-medium text-gray-300'>

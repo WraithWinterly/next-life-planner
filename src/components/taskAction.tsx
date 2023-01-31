@@ -178,7 +178,7 @@ function TaskAction({ action, editTaskData }: TaskActionProps) {
               className='btn mx-0 gap-2'
               onClick={() => router.push('/dashboard')}>
               <div className='tw-btn-icon'>
-                <ArrowLeftIcon aria-hidden='false' />
+                <ArrowLeftIcon aria-hidden='false' className='w-8' />
               </div>
               Back
             </button>
@@ -200,7 +200,7 @@ function TaskAction({ action, editTaskData }: TaskActionProps) {
               }}>
               {action === 'create' ? 'Create Daily Task' : 'Submit Edit'}
               <div className='tw-btn-icon'>
-                <PlusIcon aria-hidden='false' />
+                <PlusIcon aria-hidden='false' className='w-8' />
               </div>
             </button>
           </div>

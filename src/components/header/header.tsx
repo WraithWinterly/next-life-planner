@@ -24,7 +24,7 @@ export default function Header({ title }: HeaderProps) {
                   router.pathname === '/' && 'bg-green-700 hover:bg-green-600'
                 }`}>
                 <div className='tw-btn-icon'>
-                  <HomeIcon aria-hidden='false' />
+                  <HomeIcon aria-hidden='false' className='w-8' />
                 </div>
                 <div className='hidden md:block'>Home</div>
               </button>
@@ -38,7 +38,7 @@ export default function Header({ title }: HeaderProps) {
                     'bg-green-700 hover:bg-green-600'
                   }`}>
                   <div className='tw-btn-icon'>
-                    <ChartBarSquareIcon aria-hidden='false' />
+                    <ChartBarSquareIcon aria-hidden='false' className='w-8' />
                   </div>
                   <div className='hidden md:block'>Dashboard</div>
                 </button>
