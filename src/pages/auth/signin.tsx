@@ -1,6 +1,7 @@
 import LoadingScreen from '@components/ui-common/loadingScreen';
 import LoadingSpinner from '@components/ui-common/loadingSpinner';
 import { getProviders, signIn } from 'next-auth/react';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { FaGithub } from 'react-icons/fa';
@@ -40,9 +41,12 @@ export default function SignIn({ providers }: any) {
               </h3>
             )}
           </div>
-          <img
+          <Image
             src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg'
             className='h-80 py-6'
+            width={400}
+            height={400}
+            alt='Sign In'
           />
         </div>
       </section>

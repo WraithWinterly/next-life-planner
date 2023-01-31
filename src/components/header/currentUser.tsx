@@ -12,6 +12,7 @@ import {
 import { Fragment } from 'react';
 import LoadingScreen from '../ui-common/loadingScreen';
 import LoadingSpinner from '../ui-common/loadingSpinner';
+import { ArrowLeftOnRectangleIcon } from '@heroicons/react/24/outline';
 
 interface MenuOptions {
   name: string;
@@ -57,13 +58,15 @@ export default function CurrentUser() {
         )}
         {!session && !loading && (
           <a
-            className='btn w-32 h-12'
             onClick={(e) => {
               e.preventDefault();
               setLoadingSignInOrOut(true);
               signIn();
             }}>
-            Sign in
+            <button className='btn h-12 gap-3'>
+              <ArrowLeftOnRectangleIcon className='w-8' />
+              <span>Sign In</span>
+            </button>
           </a>
         )}
         {session && (
