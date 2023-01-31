@@ -32,7 +32,7 @@ export default function ClientPage() {
         <div className='flex items-center flex-col gap-2 mt-2'>
           {!!user.image ? (
             <img
-              src={user.image}
+              src={user?.image}
               alt={'Profile'}
               className='w-32 h-32 rounded-full'
             />
